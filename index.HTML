@@ -221,17 +221,16 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 30, 0, 0.15); /* Teinte d'alerte rouge */
-            z-index: 400; /* Situé sous le viseur mais au-dessus de la zone de jeu */
+            background: rgba(255, 30, 0, 0.15); 
+            z-index: 400; 
             display: flex;
             justify-content: center;
             align-items: center;
             opacity: 0;
-            pointer-events: none; /* Désactivé par défaut */
+            pointer-events: none; 
             transition: opacity 0.2s ease;
         }
 
-        /* CRITICAL FIX : Quand actif, il intercepte et bloque physiquement tous les clics */
         .penalty-overlay.active {
             opacity: 1;
             pointer-events: auto; 
@@ -316,11 +315,10 @@
             height: 50px;
             transform: translate(-50%, -50%);
             pointer-events: none;
-            z-index: 600; /* Reste toujours au-dessus du bloqueur de pénalité */
+            z-index: 600; 
             mix-blend-mode: difference;
         }
 
-        /* Changement visuel du viseur lors d'une pénalité */
         .crosshair.disrupted .circle,
         .crosshair.disrupted .dot,
         .crosshair.disrupted .line {
@@ -519,7 +517,6 @@
 
         /* --- SYSTÈME HORLOGE & INITIALISATION --- */
         function startGame() {
-            // Nettoyage complet des résidus de parties précédentes
             clearInterval(gameTimerInterval);
             clearInterval(penaltyInterval);
             
@@ -564,14 +561,19 @@
             
             target.classList.remove('active');
             
-            const padding = 100;
-            const maxX = window.innerWidth - padding;
-            const maxY = window.innerHeight - padding;
+            // CONFIGURATION DE LA ZONE D'EXCLUSION DU HUD
+            const paddingSide = 60; // Marge pour les côtés droit, gauche et bas
+            const hudSafeZone = 150; // On interdit l'apparition dans les 150px du haut (où se trouvent le chrono, score et bonus)
             
-            const randomX = Math.floor(Math.random() * (maxX - padding)) + padding;
-            const randomY = Math.floor(Math.random() * (maxY - padding)) + padding;
+            const minX = paddingSide;
+            const maxX = window.innerWidth - paddingSide;
+            const minY = hudSafeZone; 
+            const maxY = window.innerHeight - paddingSide;
+            
+            // Calcul restreint pour protéger l'interface utilisateur
+            const randomX = Math.floor(Math.random() * (maxX - minX)) + minX;
+            const randomY = Math.floor(Math.random() * (maxY - minY)) + minY;
 
-            // Micro-délai pour laisser le temps à l'animation scale(0) de se faire
             setTimeout(() => {
                 if (!isGameActive || isPenalized) return;
                 target.style.left = `${randomX}px`;
@@ -582,13 +584,9 @@
 
         /* --- ÉCOUTEURS ET RECONNAISSANCE DES TIRS --- */
         function processShot(e, isKeyboard = false) {
-            // Blocages prioritaires
             if (!isGameActive || isPenalized) return;
-            
-            // Empêche le clic d'interagir avec les boutons cachés des menus en arrière-plan
             if (e && e.target.closest('.screen-overlay')) return; 
 
-            // Déclenchement de l'effet flash lumineux du tir
             flash.classList.remove('fire');
             void flash.offsetWidth; 
             flash.classList.add('fire');
@@ -606,7 +604,6 @@
                 posY = e.clientY;
             }
 
-            // Traitement du résultat du tir
             if (hitTarget) {
                 handleHit(posX, posY);
             } else {
@@ -614,7 +611,6 @@
             }
         }
 
-        // Événements d'inputs globaux nettoyés
         window.addEventListener('mousedown', (e) => {
             if (isGameActive && !isPenalized) {
                 e.stopPropagation();
@@ -633,7 +629,6 @@
             streak++;
             if (streak > maxStreak) maxStreak = streak;
 
-            // paliers multiplicateurs
             if (streak >= 15) multiplier = 4;
             else if (streak >= 10) multiplier = 3;
             else if (streak >= 5) multiplier = 2;
@@ -642,7 +637,6 @@
             score += (100 * multiplier);
             updateHudDisplay();
 
-            // Ripple effect d'impact
             const ripple = document.createElement('div');
             ripple.classList.add('hit-ripple');
             ripple.style.left = `${x}px`;
@@ -665,15 +659,14 @@
             isPenalized = true;
             target.classList.remove('active');
             crosshair.classList.add('disrupted');
-            penaltyScreen.classList.add('active'); // L'overlay passe en pointer-events: auto et absorbe tout !
+            penaltyScreen.classList.add('active'); 
 
             let penaltyTimeLeft = 5.0;
             penaltyTimerText.textContent = `${penaltyTimeLeft.toFixed(1)}s`;
             
-            // Animation CSS ultra-propre pour la barre décroissante de chargement
             penaltyBar.style.transition = 'none';
             penaltyBar.style.transform = 'scaleX(1)';
-            void penaltyBar.offsetWidth; // Force le reflow
+            void penaltyBar.offsetWidth; 
             penaltyBar.style.transition = 'transform 5000ms linear';
             penaltyBar.style.transform = 'scaleX(0)';
 
@@ -691,7 +684,7 @@
 
         function endPenaltyBlock() {
             isPenalized = false;
-            penaltyScreen.classList.remove('active'); // Libère la capture des clics
+            penaltyScreen.classList.remove('active'); 
             crosshair.classList.remove('disrupted');
             if (isGameActive) {
                 moveTarget();
