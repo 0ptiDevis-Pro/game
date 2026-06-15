@@ -11,8 +11,8 @@
             --accent-glow: rgba(0, 255, 204, 0.3);
             --target-red: #ff3366;
             --target-glow: rgba(255, 51, 102, 0.5);
-            --penalty-orange: #ff9900;
-            --ui-bg: rgba(10, 16, 26, 0.85);
+            --penalty-orange: #ff5500;
+            --ui-bg: rgba(10, 16, 26, 0.9);
             --border-style: 1px solid rgba(255, 255, 255, 0.08);
         }
 
@@ -28,11 +28,11 @@
             height: 100%;
             overflow: hidden;
             background-color: var(--bg-color);
-            font-family: 'Montserrat', 'Segoe UI', sans-serif;
-            cursor: none; /* Cache le curseur */
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            cursor: none; /* Masque le curseur système */
         }
 
-        /* Grille d'arrière-plan animée */
+        /* Grille tactique */
         .bg-grid {
             position: absolute;
             width: 100%;
@@ -44,27 +44,27 @@
             z-index: 1;
         }
 
-        /* --- ÉCRANS DE MENU (LOBBY / GAME OVER) --- */
+        /* --- ÉCRANS MENUS (LOBBY / GAME OVER) --- */
         .screen-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(4, 6, 10, 0.9);
+            background: rgba(4, 6, 10, 0.95);
             backdrop-filter: blur(15px);
-            z-index: 200;
+            z-index: 500;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.4s ease, transform 0.4s ease;
+            transition: opacity 0.3s ease, transform 0.3s ease;
             cursor: default;
         }
 
         .screen-overlay.hidden {
             opacity: 0;
             pointer-events: none;
-            transform: scale(1.05);
+            transform: scale(1.02);
         }
 
         .menu-card {
@@ -72,7 +72,7 @@
             border: var(--border-style);
             padding: 40px;
             border-radius: 16px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
             text-align: center;
             max-width: 450px;
             width: 90%;
@@ -91,14 +91,13 @@
         }
 
         .menu-label {
-            color: rgba(255,255,255,0.5);
+            color: rgba(255,255,255,0.4);
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 15px;
         }
 
-        /* Sélecteur de temps de jeu premium */
         .time-selector {
             display: flex;
             justify-content: space-between;
@@ -164,6 +163,7 @@
         .hud-header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
@@ -178,73 +178,75 @@
             color: #fff;
             display: flex;
             flex-direction: column;
-            min-width: 150px;
+            min-width: 160px;
         }
 
         .hud-value {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
             color: var(--accent-cyan);
             text-shadow: 0 0 10px var(--accent-glow);
             margin-top: 2px;
         }
 
-        /* Multiplicateur de score de série */
         .streak-container {
-            align-items: center;
+            display: flex;
             justify-content: center;
-            position: relative;
+            align-items: center;
+            min-width: 200px;
         }
 
         .multiplier-badge {
-            font-size: 26px;
+            font-size: 18px;
             font-weight: 900;
             color: #fff;
-            background: linear-gradient(135deg, var(--target-red), #ff9900);
-            padding: 2px 12px;
+            background: linear-gradient(135deg, var(--target-red), var(--penalty-orange));
+            padding: 6px 16px;
             border-radius: 6px;
-            margin-top: 5px;
             opacity: 0;
-            transform: scale(0.7);
+            transform: scale(0.8);
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .multiplier-badge.active {
             opacity: 1;
             transform: scale(1);
-            box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);
         }
 
-        /* --- POPUP DE PÉNALITÉ (SURCHAUFFE) --- */
+        /* --- BLOQUEUR DE PÉNALITÉ (SURCHAUFFE) --- */
         .penalty-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 85, 0, 0.04);
-            z-index: 150;
+            background: rgba(255, 30, 0, 0.15); /* Teinte d'alerte rouge */
+            z-index: 400; /* Situé sous le viseur mais au-dessus de la zone de jeu */
             display: flex;
             justify-content: center;
             align-items: center;
             opacity: 0;
-            pointer-events: none;
+            pointer-events: none; /* Désactivé par défaut */
             transition: opacity 0.2s ease;
         }
 
+        /* CRITICAL FIX : Quand actif, il intercepte et bloque physiquement tous les clics */
         .penalty-overlay.active {
             opacity: 1;
+            pointer-events: auto; 
+            cursor: none;
         }
 
         .penalty-box {
-            background: #120a07;
+            background: #140805;
             border: 1px solid var(--penalty-orange);
-            padding: 25px 50px;
+            padding: 30px 60px;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 0 40px rgba(255, 153, 0, 0.2);
-            transform: translateY(20px);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 50px rgba(255, 85, 0, 0.3);
+            transform: translateY(15px);
+            transition: transform 0.25s ease;
         }
 
         .penalty-overlay.active .penalty-box {
@@ -253,23 +255,24 @@
 
         .penalty-title {
             color: var(--penalty-orange);
-            font-size: 14px;
+            font-size: 13px;
             letter-spacing: 4px;
             font-weight: 900;
             text-transform: uppercase;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .penalty-timer {
             color: #fff;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
+            letter-spacing: 1px;
         }
 
         .penalty-progress {
             width: 100%;
-            height: 3px;
-            background: rgba(255,153,0,0.2);
+            height: 4px;
+            background: rgba(255, 85, 0, 0.15);
             margin-top: 15px;
             border-radius: 2px;
             overflow: hidden;
@@ -280,9 +283,10 @@
             width: 100%;
             background: var(--penalty-orange);
             transform-origin: left;
+            transform: scaleX(1);
         }
 
-        /* --- EN-JEU : CIBLE & VISEUR --- */
+        /* --- ZONE DE JEU, CIBLE & VISEUR --- */
         .game-space {
             position: absolute;
             width: 100%;
@@ -292,34 +296,37 @@
 
         .target {
             position: absolute;
-            width: 46px;
-            height: 46px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             background: radial-gradient(circle, #fff 15%, transparent 20%, var(--target-red) 25%, transparent 35%, var(--target-red) 65%);
             box-shadow: 0 0 30px var(--target-glow);
             transform: translate(-50%, -50%) scale(0);
             transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: none;
+            pointer-events: auto;
         }
 
         .target.active {
             transform: translate(-50%, -50%) scale(1);
         }
 
-        /* Viseur Premium adaptatif */
         .crosshair {
             position: fixed;
             width: 50px;
             height: 50px;
             transform: translate(-50%, -50%);
             pointer-events: none;
-            z-index: 300;
+            z-index: 600; /* Reste toujours au-dessus du bloqueur de pénalité */
             mix-blend-mode: difference;
-            transition: width 0.1s, height 0.1s;
         }
 
-        .crosshair.disrupted {
-            opacity: 0.3;
+        /* Changement visuel du viseur lors d'une pénalité */
+        .crosshair.disrupted .circle,
+        .crosshair.disrupted .dot,
+        .crosshair.disrupted .line {
+            border-color: var(--penalty-orange) !important;
+            background: var(--penalty-orange) !important;
+            opacity: 0.5;
         }
 
         .crosshair .circle {
@@ -349,7 +356,6 @@
         .crosshair .line.left { left: 0; }
         .crosshair .line.right { right: 0; }
 
-        /* Animation éclairs & impacts */
         .flash {
             position: absolute;
             width: 100%;
@@ -359,7 +365,6 @@
             pointer-events: none;
             z-index: 2;
         }
-
         .flash.fire { animation: weapon-flash 0.1s ease-out; }
         @keyframes weapon-flash { 0% { opacity: 1; } 100% { opacity: 0; } }
 
@@ -405,15 +410,15 @@
         <div class="menu-card">
             <h1>Exercice Terminé</h1>
             <div class="menu-label">Score Final</div>
-            <div id="final-score" class="hud-value" style="font-size: 36px; margin-bottom: 20px;">00000</div>
-            <div class="menu-label">Série Max : <span id="final-streak" style="color: #fff;">0</span></div>
-            <button id="restart-btn" class="primary-btn" style="margin-top: 20px;">Recommencer</button>
+            <div id="final-score" class="hud-value" style="font-size: 38px; margin-bottom: 20px;">00000</div>
+            <div class="menu-label">Série Maximale : <span id="final-streak" style="color: #fff; font-weight: bold;">0</span></div>
+            <button id="restart-btn" class="primary-btn" style="margin-top: 20px;">Retour au Menu</button>
         </div>
     </div>
 
     <div id="penalty-screen" class="penalty-overlay">
         <div class="penalty-box">
-            <div class="penalty-title">Arme Enrayée / Surchauffe</div>
+            <div class="penalty-title">Système Enrayé / Surchauffe</div>
             <div id="penalty-timer" class="penalty-timer">5.0s</div>
             <div class="penalty-progress">
                 <div id="penalty-bar" class="penalty-bar"></div>
@@ -452,17 +457,20 @@
     </div>
 
     <script>
-        // Variables d'état globales
+        // États de jeu globaux
         let score = 0;
         let streak = 0;
         let maxStreak = 0;
         let multiplier = 1;
         let gameTimeAllocated = 60; 
         let timeLeft = 0;
+        
         let gameTimerInterval = null;
+        let penaltyInterval = null;
         
         let isGameActive = false;
         let isPenalized = false;
+        
         let mouseX = 0;
         let mouseY = 0;
 
@@ -472,21 +480,19 @@
         const gameSpace = document.getElementById('game-space');
         const flash = document.getElementById('flash');
         
-        // Menus / Panels
         const setupScreen = document.getElementById('setup-screen');
         const gameoverScreen = document.getElementById('gameover-screen');
         const penaltyScreen = document.getElementById('penalty-screen');
         const penaltyTimerText = document.getElementById('penalty-timer');
         const penaltyBar = document.getElementById('penalty-bar');
 
-        // Éléments HUD
         const hudScore = document.getElementById('hud-score');
         const hudTimer = document.getElementById('hud-timer');
         const streakBadge = document.getElementById('streak-badge');
         const finalScoreText = document.getElementById('final-score');
         const finalStreakText = document.getElementById('final-streak');
 
-        /* --- CONFIGURATION DU CURSEUR --- */
+        // Suivi ultra-fluide des coordonnées de la souris
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
@@ -496,9 +502,9 @@
             });
         });
 
-        /* --- GESTION DU REGLAGE DU TEMPS --- */
+        // Sélection de la durée initiale
         document.querySelectorAll('.time-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 gameTimeAllocated = parseInt(btn.getAttribute('data-time'));
@@ -511,8 +517,12 @@
             setupScreen.classList.remove('hidden');
         });
 
-        /* --- LOGIQUE DU JEU --- */
+        /* --- SYSTÈME HORLOGE & INITIALISATION --- */
         function startGame() {
+            // Nettoyage complet des résidus de parties précédentes
+            clearInterval(gameTimerInterval);
+            clearInterval(penaltyInterval);
+            
             score = 0;
             streak = 0;
             maxStreak = 0;
@@ -521,24 +531,29 @@
             isPenalized = false;
             isGameActive = true;
 
-            updateHud();
+            updateHudDisplay();
+            updateTimerText();
+            
             setupScreen.classList.add('hidden');
+            penaltyScreen.classList.remove('active');
             crosshair.classList.remove('disrupted');
 
-            // Boucle de chronomètre
+            // Lancement du VRAI Chronomètre isolé
             gameTimerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
-                if (timeLeft <= 0) {
-                    endGame();
+                if (isGameActive) {
+                    timeLeft--;
+                    updateTimerText();
+                    
+                    if (timeLeft <= 0) {
+                        endGame();
+                    }
                 }
             }, 1000);
 
-            updateTimerDisplay();
             moveTarget();
         }
 
-        function updateTimerDisplay() {
+        function updateTimerText() {
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
             hudTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -548,71 +563,86 @@
             if (!isGameActive || isPenalized) return;
             
             target.classList.remove('active');
-            const padding = 80;
+            
+            const padding = 100;
             const maxX = window.innerWidth - padding;
             const maxY = window.innerHeight - padding;
             
             const randomX = Math.floor(Math.random() * (maxX - padding)) + padding;
             const randomY = Math.floor(Math.random() * (maxY - padding)) + padding;
 
+            // Micro-délai pour laisser le temps à l'animation scale(0) de se faire
             setTimeout(() => {
                 if (!isGameActive || isPenalized) return;
                 target.style.left = `${randomX}px`;
                 target.style.top = `${randomY}px`;
                 target.classList.add('active');
-            }, 50);
+            }, 60);
         }
 
-        /* --- GESTION DES TIRS (TOUCHES/RATES) --- */
-        function fireWeapon(e, isKeyboard = false) {
+        /* --- ÉCOUTEURS ET RECONNAISSANCE DES TIRS --- */
+        function processShot(e, isKeyboard = false) {
+            // Blocages prioritaires
             if (!isGameActive || isPenalized) return;
+            
+            // Empêche le clic d'interagir avec les boutons cachés des menus en arrière-plan
+            if (e && e.target.closest('.screen-overlay')) return; 
 
-            // Flash visuel d'actionnement de l'arme
+            // Déclenchement de l'effet flash lumineux du tir
             flash.classList.remove('fire');
-            void flash.offsetWidth;
+            void flash.offsetWidth; 
             flash.classList.add('fire');
 
-            let hitElement;
-            let currentX, currentY;
+            let hitTarget = false;
+            let posX = mouseX;
+            let posY = mouseY;
 
             if (isKeyboard) {
-                hitElement = document.elementFromPoint(mouseX, mouseY);
-                currentX = mouseX;
-                currentY = mouseY;
+                const elementAtCursor = document.elementFromPoint(mouseX, mouseY);
+                if (elementAtCursor === target) hitTarget = true;
             } else {
-                hitElement = e.target;
-                currentX = e.clientX;
-                currentY = e.clientY;
+                if (e.target === target) hitTarget = true;
+                posX = e.clientX;
+                posY = e.clientY;
             }
 
-            // Vérification de la cible
-            if (hitElement === target) {
-                handleHit(currentX, currentY);
+            // Traitement du résultat du tir
+            if (hitTarget) {
+                handleHit(posX, posY);
             } else {
                 handleMiss();
             }
         }
 
-        // Événements d'activation de l'arme
-        gameSpace.addEventListener('mousedown', (e) => fireWeapon(e, false));
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') fireWeapon(e, true);
+        // Événements d'inputs globaux nettoyés
+        window.addEventListener('mousedown', (e) => {
+            if (isGameActive && !isPenalized) {
+                e.stopPropagation();
+                processShot(e, false);
+            }
         });
 
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && isGameActive && !isPenalized) {
+                processShot(null, true);
+            }
+        });
+
+        /* --- COMMANDES DE HIT ET DE MISS --- */
         function handleHit(x, y) {
             streak++;
             if (streak > maxStreak) maxStreak = streak;
 
-            // Calcul du multiplicateur de combo progressif
+            // paliers multiplicateurs
             if (streak >= 15) multiplier = 4;
             else if (streak >= 10) multiplier = 3;
             else if (streak >= 5) multiplier = 2;
             else multiplier = 1;
 
-            score += 100 * multiplier;
-            updateHud();
+            score += (100 * multiplier);
+            updateHudDisplay();
 
-            // Effet d'impact visuel
+            // Ripple effect d'impact
             const ripple = document.createElement('div');
             ripple.classList.add('hit-ripple');
             ripple.style.left = `${x}px`;
@@ -624,55 +654,55 @@
         }
 
         function handleMiss() {
-            // Un tir raté réinitialise instantanément la série et applique la pénalité
             streak = 0;
             multiplier = 1;
-            updateHud();
-            triggerPenalty();
+            updateHudDisplay();
+            triggerPenaltyBlock();
         }
 
-        /* --- SYSTÈME DE PÉNALITÉ (POPUP 5 SECONDES) --- */
-        function triggerPenalty() {
+        /* --- VERROUILLAGE PHYSIQUE ET VISUEL DE PÉNALITÉ --- */
+        function triggerPenaltyBlock() {
             isPenalized = true;
             target.classList.remove('active');
             crosshair.classList.add('disrupted');
-            penaltyScreen.classList.add('active');
+            penaltyScreen.classList.add('active'); // L'overlay passe en pointer-events: auto et absorbe tout !
 
             let penaltyTimeLeft = 5.0;
             penaltyTimerText.textContent = `${penaltyTimeLeft.toFixed(1)}s`;
-            penaltyBar.style.transform = 'scaleX(1)';
             
-            // Animation fluide de la barre de progression décroissante
+            // Animation CSS ultra-propre pour la barre décroissante de chargement
             penaltyBar.style.transition = 'none';
-            void penaltyBar.offsetWidth;
+            penaltyBar.style.transform = 'scaleX(1)';
+            void penaltyBar.offsetWidth; // Force le reflow
             penaltyBar.style.transition = 'transform 5000ms linear';
             penaltyBar.style.transform = 'scaleX(0)';
 
-            const penaltyInterval = setInterval(() => {
+            clearInterval(penaltyInterval);
+            penaltyInterval = setInterval(() => {
                 penaltyTimeLeft -= 0.1;
                 if (penaltyTimeLeft <= 0) {
                     clearInterval(penaltyInterval);
-                    endPenalty();
+                    endPenaltyBlock();
                 } else {
                     penaltyTimerText.textContent = `${Math.max(0, penaltyTimeLeft).toFixed(1)}s`;
                 }
             }, 100);
         }
 
-        function endPenalty() {
+        function endPenaltyBlock() {
             isPenalized = false;
-            penaltyScreen.classList.remove('active');
+            penaltyScreen.classList.remove('active'); // Libère la capture des clics
             crosshair.classList.remove('disrupted');
             if (isGameActive) {
                 moveTarget();
             }
         }
 
-        function updateHud() {
+        function updateHudDisplay() {
             hudScore.textContent = String(score).padStart(5, '0');
             
             if (multiplier > 1) {
-                streakBadge.textContent = `X${multiplier} (${streak} COMBO)`;
+                streakBadge.textContent = `X${multiplier} (${streak} SÉRIE)`;
                 streakBadge.className = 'multiplier-badge active';
             } else {
                 streakBadge.className = 'multiplier-badge';
@@ -682,7 +712,11 @@
         function endGame() {
             isGameActive = false;
             clearInterval(gameTimerInterval);
+            clearInterval(penaltyInterval);
+            
             target.classList.remove('active');
+            penaltyScreen.classList.remove('active');
+            crosshair.classList.remove('disrupted');
             
             finalScoreText.textContent = String(score).padStart(5, '0');
             finalStreakText.textContent = maxStreak;
