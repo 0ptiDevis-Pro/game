@@ -107,7 +107,7 @@
             width: 42px;      
             height: 64px;     
             bottom: 3px; 
-            left: -50px; /* Démarre caché à l'extérieur de la vitre */
+            left: -50px; 
             transform-origin: bottom center;
             pointer-events: none;
             z-index: 10;
@@ -299,14 +299,23 @@
 
     <div id="gameover-screen" class="screen-overlay hidden">
         <div class="menu-card">
-            <h1>Rapport de Fin</h1>
-            <div class="menu-label">Cibles Abattues</div>
-            <div id="final-score" class="hud-value" style="font-size: 38px;">00</div>
-            <div id="credits-earned" style="color: #00e5ff; font-size: 12px; margin-bottom: 15px;">+0 $ ajoutés en direct</div>
-            <div class="menu-label" style="margin-bottom:15px;">Meilleure Série : <span id="final-streak" style="color:#fff;">0</span></div>
+            <h1 id="gameover-title">Rapport de Fin</h1>
             
-            <button id="second-chance-btn" class="primary-btn" style="border-color:#ff6c00; color:#ff6c00;">🎬 Gilet Pare-balles (Seconde Chance)</button>
-            <button id="restart-btn" class="secondary-btn">Archiver la mission (Nouveau Run)</button>
+            <div id="gameover-content">
+                <div class="menu-label">Cibles Abattues</div>
+                <div id="final-score" class="hud-value" style="font-size: 38px;">00</div>
+                <div id="credits-earned" style="color: #00e5ff; font-size: 12px; margin-bottom: 15px;">+0 $ ajoutés en direct</div>
+                <div class="menu-label" style="margin-bottom:15px;">Meilleure Série : <span id="final-streak" style="color:#fff;">0</span></div>
+                
+                <button id="second-chance-btn" class="primary-btn" style="border-color:#ff6c00; color:#ff6c00;">🎬 Gilet Pare-balles (Seconde Chance)</button>
+                <button id="restart-btn" class="secondary-btn">Archiver la mission (Nouveau Run)</button>
+            </div>
+
+            <div id="resume-container" style="display: none; margin-top: 15px;">
+                <div class="menu-label" style="color: var(--accent-cyan);">Don effectué ou en cours ?</div>
+                <p style="color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 15px;">Cliquez ci-dessous dès que vous êtes prêt à reprendre.</p>
+                <button id="resume-btn" class="primary-btn">▶️ Reprendre la mission</button>
+            </div>
         </div>
     </div>
 
@@ -358,12 +367,17 @@
         let hasUsedSecondChance = false, isGameActive = false, isPenalized = false;
         let mouseX = 0, mouseY = 0;
         let gameTimerInterval = null, penaltyInterval = null, targetEscapeTimeout = null;
+        let pendingAction = null; // Stocke ce qu'on doit faire après la pause du don ('restart' ou 'bonus')
 
         const crosshair = document.getElementById('crosshair');
         const flash = document.getElementById('flash');
         const buildingGrid = document.getElementById('building-grid');
         const setupScreen = document.getElementById('setup-screen');
         const gameoverScreen = document.getElementById('gameover-screen');
+        const gameoverTitle = document.getElementById('gameover-title');
+        const gameoverContent = document.getElementById('gameover-content');
+        const resumeContainer = document.getElementById('resume-container');
+        const resumeBtn = document.getElementById('resume-btn');
         const shopScreen = document.getElementById('shop-screen');
         const penaltyScreen = document.getElementById('penalty-screen');
         const penaltyTimerText = document.getElementById('penalty-timer');
@@ -440,16 +454,18 @@
 
         document.getElementById('start-btn').addEventListener('click', startGame);
 
-        // --- NOUVELLE FONCTIONNALITÉ : DONATION LORS DU RELANCEMENT ---
+        // --- CLIC SUR TOUT REPRENDRE / ARCHIVER ---
         document.getElementById('restart-btn').addEventListener('click', () => {
-            alert("Faites un don pour accéder à cette fonctionnalité");
-            window.open("https://revolut.me/robini_rd", "_blank");
-            
-            gameoverScreen.classList.add('hidden');
-            setupScreen.classList.remove('hidden');
-            renderLeaderboard();
+            triggerDonationPause('restart');
         });
 
+        // --- CLIC SUR GILET PARE-BALLES / SECONDE CHANCE ---
+        document.getElementById('second-chance-btn').addEventListener('click', () => {
+            if (hasUsedSecondChance) return;
+            triggerDonationPause('bonus');
+        });
+
+        // --- INTERFACES BOUTIQUE ---
         document.getElementById('open-shop-btn').addEventListener('click', () => {
             setupScreen.classList.add('hidden'); shopScreen.classList.remove('hidden');
             buildShopUI();
@@ -459,23 +475,54 @@
             updateHubCreditsDisplay();
         });
 
-        // --- NOUVELLE FONCTIONNALITÉ : DONATION LORS DE LA NOUVELLE VIE/TEMPS BONUS ---
-        document.getElementById('second-chance-btn').addEventListener('click', () => {
+        // --- SYSTÈME DE PAUSE ET REDIRECTION ---
+        function triggerDonationPause(actionType) {
+            pendingAction = actionType;
+            
+            // Redirection immédiate
             alert("Faites un don pour accéder à cette fonctionnalité");
             window.open("https://revolut.me/robini_rd", "_blank");
 
-            if (hasUsedSecondChance) return;
-            hasUsedSecondChance = true;
-            document.getElementById('second-chance-btn').style.display = 'none';
-            isGameActive = true;
-            gameoverScreen.classList.add('hidden');
-            if (gameMode === 'chrono') { timeLeft = 30; launchChronoLoop(); } 
-            else { survivalLives = 1; }
-            updateTimerText();
-            isPenalized = false;
-            penaltyScreen.classList.remove('active');
-            crosshair.classList.remove('disrupted');
-            moveTargetToRandomWindow();
+            // Modification visuelle du menu de fin pour marquer le temps d'arrêt
+            gameoverTitle.textContent = "⚙️ Pause tactique";
+            gameoverContent.style.display = "none";
+            resumeContainer.style.display = "block";
+        }
+
+        // --- CLIC SUR LE BOUTON APRÈS LE DON POUR ENFIN LANCER ---
+        resumeBtn.addEventListener('click', () => {
+            // Remet les menus dans l'état par défaut pour la prochaine partie
+            gameoverTitle.textContent = "Rapport de Fin";
+            gameoverContent.style.display = "block";
+            resumeContainer.style.display = "none";
+
+            if (pendingAction === 'restart') {
+                // Relance standard
+                gameoverScreen.classList.add('hidden');
+                setupScreen.classList.remove('hidden');
+                renderLeaderboard();
+            } 
+            else if (pendingAction === 'bonus') {
+                // Application de la seconde chance maintenant que l'utilisateur a cliqué
+                hasUsedSecondChance = true;
+                document.getElementById('second-chance-btn').style.display = 'none';
+                isGameActive = true;
+                gameoverScreen.classList.add('hidden');
+                
+                if (gameMode === 'chrono') { 
+                    timeLeft = 30; 
+                    launchChronoLoop(); 
+                } else { 
+                    survivalLives = 1; 
+                }
+                
+                updateTimerText();
+                isPenalized = false;
+                penaltyScreen.classList.remove('active');
+                crosshair.classList.remove('disrupted');
+                moveTargetToRandomWindow();
+            }
+            pendingAction = null;
         });
 
         function startGame() {
