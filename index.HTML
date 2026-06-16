@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KORTEX // Rogue AI Core Eliminator</title>
+    <title>TRIGGER AGENT // Red Syndicate Takedown</title>
     <style>
         :root {
-            --bg-color: #04060a;
-            --accent-cyan: #00ffcc; 
-            --accent-glow: rgba(0, 255, 204, 0.3);
-            --target-red: #ff2a5f;
-            --target-glow: rgba(255, 42, 95, 0.6);
-            --penalty-orange: #ff5500;
-            --ui-bg: rgba(7, 11, 19, 0.92);
-            --border-style: 1px solid rgba(255, 255, 255, 0.06);
+            --bg-color: #0b0e14;
+            --accent-cyan: #00e5ff; /* Couleur du viseur laser de l'Agent */
+            --accent-glow: rgba(0, 229, 255, 0.4);
+            --target-red: #ff2353; /* Rouge syndicat */
+            --target-glow: rgba(255, 35, 83, 0.6);
+            --penalty-orange: #ff6c00;
+            --ui-bg: rgba(15, 20, 31, 0.94);
+            --border-style: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         * {
@@ -32,27 +32,27 @@
             cursor: none;
         }
 
-        /* Grille matrice tactique */
+        /* Skyline de la ville en arrière-plan */
         .bg-grid {
             position: absolute;
             width: 100%;
             height: 100%;
             background-image: 
-                linear-gradient(rgba(0, 255, 204, 0.01) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 204, 0.01) 1px, transparent 1px);
-            background-size: 40px 40px;
+                linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.005) 1px, transparent 1px);
+            background-size: 50px 50px;
             z-index: 1;
         }
 
-        /* --- ÉCRANS MENUS (LOBBY / GAME OVER / BOUTIQUE) --- */
+        /* --- ÉCRANS MENUS (STYLE CASUAL / ACTION) --- */
         .screen-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(3, 5, 8, 0.97);
-            backdrop-filter: blur(20px);
+            background: rgba(8, 11, 18, 0.98);
+            backdrop-filter: blur(25px);
             z-index: 500;
             display: flex;
             justify-content: center;
@@ -64,17 +64,17 @@
         .screen-overlay.hidden {
             opacity: 0;
             pointer-events: none;
-            transform: scale(1.02);
+            transform: scale(1.03);
         }
 
         .menu-card {
             background: var(--ui-bg);
             border: var(--border-style);
-            padding: 35px;
-            border-radius: 16px;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 40px 90px rgba(0,0,0,0.85);
             text-align: center;
-            max-width: 500px;
+            max-width: 480px;
             width: 95%;
             max-height: 95vh;
             overflow-y: auto;
@@ -82,28 +82,27 @@
 
         .menu-card h1 {
             color: #fff;
-            font-size: 28px;
-            letter-spacing: 8px;
+            font-size: 32px;
+            letter-spacing: 4px;
             text-transform: uppercase;
             margin-bottom: 5px;
             font-weight: 900;
-            background: linear-gradient(45deg, #fff, var(--accent-cyan));
+            background: linear-gradient(135deg, #fff, var(--accent-cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .lore-summary {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.35);
-            line-height: 1.5;
-            margin-bottom: 20px;
-            letter-spacing: 0.5px;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
-            padding-bottom: 15px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.6;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .menu-label {
-            color: rgba(255,255,255,0.4);
+            color: rgba(255,255,255,0.3);
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -111,7 +110,7 @@
             margin-top: 15px;
         }
 
-        /* Sélecteurs */
+        /* Boutons de sélection */
         .selector-row {
             display: flex;
             justify-content: space-between;
@@ -121,11 +120,11 @@
 
         .toggle-btn {
             flex: 1;
-            background: rgba(255,255,255,0.02);
+            background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.08);
-            color: rgba(255,255,255,0.6);
-            padding: 12px 6px;
-            border-radius: 8px;
+            color: rgba(255,255,255,0.7);
+            padding: 14px 8px;
+            border-radius: 10px;
             font-weight: 700;
             font-size: 11px;
             cursor: pointer;
@@ -136,8 +135,8 @@
 
         .toggle-btn:hover, .toggle-btn.active {
             background: var(--accent-cyan);
-            color: var(--bg-color);
-            box-shadow: 0 0 15px var(--accent-glow);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-glow);
             border-color: var(--accent-cyan);
             font-weight: 800;
         }
@@ -147,30 +146,30 @@
             background: transparent;
             border: 2px solid var(--accent-cyan);
             color: var(--accent-cyan);
-            padding: 15px;
-            border-radius: 8px;
+            padding: 16px;
+            border-radius: 10px;
             font-size: 13px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 3px;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
         .primary-btn:hover {
             background: var(--accent-cyan);
-            color: var(--bg-color);
-            box-shadow: 0 0 25px var(--accent-glow);
+            color: #000;
+            box-shadow: 0 0 30px var(--accent-glow);
         }
 
         .secondary-btn {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #aaa;
+            color: #999;
             width: 100%;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 13px;
+            border-radius: 10px;
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
@@ -184,19 +183,19 @@
             color: #fff;
         }
 
-        /* --- BOUTIQUE --- */
+        /* --- ARSENAL / BOUTIQUE DE LASERS --- */
         .shop-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 12px;
             margin-top: 10px;
         }
 
         .shop-item {
             background: rgba(255,255,255,0.01);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 8px;
-            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -204,20 +203,20 @@
 
         .shop-item:hover {
             background: rgba(255,255,255,0.04);
-            border-color: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.2);
         }
 
         .shop-item.equipped {
             border-color: var(--accent-cyan);
-            background: rgba(0, 255, 204, 0.04);
+            background: rgba(0, 229, 255, 0.05);
         }
 
         .skin-preview {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            margin: 0 auto 8px auto;
-            box-shadow: 0 0 10px currentColor;
+            margin: 0 auto 10px auto;
+            box-shadow: 0 0 15px currentColor;
         }
 
         .skin-name {
@@ -228,39 +227,39 @@
 
         .skin-cost {
             font-size: 11px;
-            color: #00ffcc;
-            margin-top: 4px;
+            color: var(--accent-cyan);
+            margin-top: 5px;
             font-weight: 700;
         }
 
-        /* --- STATS & LEADERBOARD LOCAL --- */
+        /* --- STATS ET BANQUE --- */
         .stats-display {
             display: flex;
             justify-content: space-around;
-            background: rgba(0,0,0,0.5);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255,255,255,0.02);
+            background: rgba(0,0,0,0.4);
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.03);
         }
 
         .leaderboard-list {
             text-align: left;
             background: rgba(0,0,0,0.3);
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 10px;
             font-size: 12px;
             color: #ccc;
         }
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.02);
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
         }
         .leaderboard-item:last-child { border: none; }
 
-        /* --- INTERFACE DE JEU (HUD) --- */
+        /* --- HUD SÉCURISÉ --- */
         .hud-layer {
             position: absolute;
             top: 0;
@@ -287,20 +286,20 @@
         .hud-panel {
             background: var(--ui-bg);
             border: var(--border-style);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             padding: 12px 25px;
-            border-radius: 10px;
+            border-radius: 12px;
             color: #fff;
             display: flex;
             flex-direction: column;
-            min-width: 170px;
+            min-width: 180px;
         }
 
         .hud-value {
-            font-size: 24px;
-            font-weight: 800;
+            font-size: 26px;
+            font-weight: 900;
             color: var(--accent-cyan);
-            text-shadow: 0 0 10px var(--accent-glow);
+            text-shadow: 0 0 15px var(--accent-glow);
             margin-top: 2px;
         }
 
@@ -316,8 +315,8 @@
             font-weight: 900;
             color: #fff;
             background: linear-gradient(135deg, var(--target-red), var(--penalty-orange));
-            padding: 6px 16px;
-            border-radius: 6px;
+            padding: 6px 18px;
+            border-radius: 8px;
             opacity: 0;
             transform: scale(0.8);
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -326,24 +325,24 @@
         .multiplier-badge.active {
             opacity: 1;
             transform: scale(1);
-            box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);
+            box-shadow: 0 0 25px rgba(255, 35, 83, 0.4);
         }
 
-        /* --- INTERCEPTEUR DE PÉNALITÉ (SURCHAUFFE) --- */
+        /* --- CONTEXTE DE PÉNALITÉ : À COUVERT / ENEMY RETALIATION --- */
         .penalty-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 30, 0, 0.12); 
+            background: rgba(255, 40, 0, 0.08); 
             z-index: 400; 
             display: flex;
             justify-content: center;
             align-items: center;
             opacity: 0;
             pointer-events: none; 
-            transition: opacity 0.2s ease;
+            transition: opacity 0.15s ease;
         }
 
         .penalty-overlay.active {
@@ -352,15 +351,21 @@
             cursor: none;
         }
 
+        /* Mur en béton de protection tactique */
         .penalty-box {
-            background: #0f0503;
-            border: 1px solid var(--penalty-orange);
-            padding: 30px 60px;
-            border-radius: 12px;
+            background: linear-gradient(180deg, #1e222b 0%, #13151b 100%);
+            border: 2px solid var(--penalty-orange);
+            border-bottom: none;
+            padding: 40px 60px;
+            border-radius: 20px 20px 0 0;
             text-align: center;
-            box-shadow: 0 0 50px rgba(255, 85, 0, 0.25);
-            transform: translateY(15px);
-            transition: transform 0.25s ease;
+            box-shadow: 0 -20px 50px rgba(255, 108, 0, 0.2);
+            transform: translateY(100vh); /* Surgit du bas comme une couverture */
+            transition: transform 0.2s cubic-bezier(0.1, 0.8, 0.3, 1);
+            width: 100%;
+            max-width: 600px;
+            position: absolute;
+            bottom: 0;
         }
 
         .penalty-overlay.active .penalty-box {
@@ -369,26 +374,33 @@
 
         .penalty-title {
             color: var(--penalty-orange);
-            font-size: 13px;
-            letter-spacing: 4px;
+            font-size: 14px;
+            letter-spacing: 5px;
             font-weight: 900;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
+        }
+
+        .penalty-sub {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
         }
 
         .penalty-timer {
             color: #fff;
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: 1px;
+            font-size: 36px;
+            font-weight: 900;
         }
 
         .penalty-progress {
             width: 100%;
-            height: 4px;
-            background: rgba(255, 85, 0, 0.15);
-            margin-top: 15px;
-            border-radius: 2px;
+            height: 6px;
+            background: rgba(255, 108, 0, 0.15);
+            margin-top: 20px;
+            border-radius: 3px;
             overflow: hidden;
         }
 
@@ -400,7 +412,7 @@
             transform: scaleX(1);
         }
 
-        /* --- ZONE DE JEU & DESIGN SCI-FI DES CIBLES --- */
+        /* --- DESIGN STYLE "JOHNNY TRIGGER" DES ENNEMIS --- */
         .game-space {
             position: absolute;
             width: 100%;
@@ -408,15 +420,20 @@
             z-index: 5;
         }
 
-        /* Conteneur physique de la cible (gère la position et l'apparition) */
+        /* Le conteneur du mafieux (Chapeau, Tête, Lunettes) */
         .target {
             position: absolute;
-            width: 52px;
-            height: 52px;
+            width: 54px;
+            height: 54px;
+            background: #151722; /* Teinte mafieuse */
+            border: 3px solid var(--target-red);
+            border-radius: 50%;
+            box-shadow: 0 0 25px var(--target-glow);
             transform: translate(-50%, -50%) scale(0);
             transition: transform 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: auto;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
@@ -425,36 +442,36 @@
             transform: translate(-50%, -50%) scale(1);
         }
 
-        /* Le Noyau Énergétique Central de l'IA (Plasma) */
-        .target::before {
-            content: '';
+        /* Chapeau Fedora du parrain */
+        .target-hat {
+            width: 44px;
+            height: 6px;
+            background: var(--target-red);
+            border-radius: 3px;
+            box-shadow: 0 0 10px var(--target-red);
             position: absolute;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #ffffff 20%, var(--target-red) 60%, transparent 100%);
-            box-shadow: 0 0 25px 8px var(--target-glow);
-            z-index: 2;
+            top: 10px;
+            transition: background 0.2s;
         }
 
-        /* L'anneau technologique de verrouillage rotatif */
-        .target::after {
-            content: '';
+        /* Lunettes de soleil blanches lumineuses (Style Vector minimaliste) */
+        .target-glasses {
+            display: flex;
+            gap: 3px;
             position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 2px dashed var(--target-red);
-            border-radius: 50%;
-            box-shadow: 0 0 12px var(--target-glow);
-            animation: core-spin 4s linear infinite;
-            z-index: 1;
+            top: 24px;
         }
 
-        @keyframes core-spin {
-            100% { transform: rotate(360deg); }
+        .target-glasses::before, .target-glasses::after {
+            content: '';
+            width: 13px;
+            height: 7px;
+            background: #ffffff;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 0 12px #ffffff;
         }
 
-        /* --- VISEUR PREMIUM --- */
+        /* --- VISEUR LASER --- */
         .crosshair {
             position: fixed;
             width: 50px;
@@ -470,7 +487,7 @@
         .crosshair.disrupted .line {
             border-color: var(--penalty-orange) !important;
             background: var(--penalty-orange) !important;
-            opacity: 0.5;
+            opacity: 0.4;
         }
 
         .crosshair .circle {
@@ -524,7 +541,7 @@
 
         .footer-text {
             text-align: center;
-            color: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.12);
             font-size: 10px;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -538,78 +555,79 @@
 
     <div id="setup-screen" class="screen-overlay">
         <div class="menu-card">
-            <h1>KORTEX // DESTRUCT</h1>
+            <h1>TRIGGER AGENT</h1>
             <div class="lore-summary">
-                ALERTE : Sécurité du Mainframe compromise. Des noyaux d'I.A. autonomes (Rogue Cores) se dupliquent en tâche de fond. Purgez la grille avant saturation complète du système.
+                Le Syndicat Rouge a déployé ses assassins sur les toits. Neutralisez les cibles à vue. Attention : chaque tir manqué révèle votre position et déclenche leur riposte !
             </div>
             
             <div class="stats-display">
                 <div>
-                    <div style="font-size:9px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing: 1px;">Nanocrédits réseaux</div>
-                    <div id="hub-credits" style="color:#00ffcc; font-weight:800; font-size:18px;">0</div>
+                    <div style="font-size:9px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing: 1px;">Primes encaissées</div>
+                    <div id="hub-credits" style="color:#00e5ff; font-weight:900; font-size:20px;">0 $</div>
                 </div>
             </div>
 
-            <div class="menu-label">Mode d'interception</div>
+            <div class="menu-label">Type de contrat</div>
             <div class="selector-row">
-                <button class="toggle-btn active" id="mode-chrono-btn">Contre-la-montre</button>
-                <button class="toggle-btn" id="mode-survival-btn">Survie Réseau (3 Vies)</button>
+                <button class="toggle-btn active" id="mode-chrono-btn">Nettoyage Chronométré</button>
+                <button class="toggle-btn" id="mode-survival-btn">Assaut Tactique (3 Vies)</button>
             </div>
 
             <div id="time-selector-wrapper">
-                <div class="menu-label">Fenêtre de scan temporel</div>
+                <div class="menu-label">Fenêtre d'intervention</div>
                 <div class="selector-row">
-                    <button class="time-btn toggle-btn active" data-time="60">1 Min</button>
-                    <button class="time-btn toggle-btn" data-time="120">2 Min</button>
-                    <button class="time-btn toggle-btn" data-time="180">3 Min</button>
+                    <button class="time-btn toggle-btn active" data-time="60">60 Sec</button>
+                    <button class="time-btn toggle-btn" data-time="120">120 Sec</button>
+                    <button class="time-btn toggle-btn" data-time="180">180 Sec</button>
                 </div>
             </div>
 
-            <div class="menu-label">Meilleures performances mémorisées</div>
+            <div class="menu-label">Meilleurs Contrats Archivés</div>
             <div id="leaderboard" class="leaderboard-list"></div>
 
-            <button id="start-btn" class="primary-btn">Initialiser la purge</button>
-            <button id="open-shop-btn" class="secondary-btn">Optimiser les optiques (Boutique)</button>
+            <button id="start-btn" class="primary-btn">Accepter le contrat</button>
+            <button id="open-shop-btn" class="secondary-btn">Acheter des Viseurs Lasers (Boutique)</button>
         </div>
     </div>
 
     <div id="shop-screen" class="screen-overlay hidden">
         <div class="menu-card">
-            <h1>Filtres Optiques</h1>
+            <h1>Armurerie de l'Agence</h1>
             <div class="stats-display">
                 <div>
-                    <div style="font-size:10px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Crédits décryptés</div>
-                    <div id="shop-credits" style="color:#00ffcc; font-weight:800; font-size:18px;">0</div>
+                    <div style="font-size:10px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Budget disponible</div>
+                    <div id="shop-credits" style="color:#00e5ff; font-weight:900; font-size:18px;">0 $</div>
                 </div>
             </div>
 
             <div class="shop-grid" id="shop-items-container"></div>
 
-            <button id="close-shop-btn" class="primary-btn">Fermer la console</button>
+            <button id="close-shop-btn" class="primary-btn">Quitter l'armurerie</button>
         </div>
     </div>
 
     <div id="gameover-screen" class="screen-overlay hidden">
         <div class="menu-card">
-            <h1>Analyse Post-Purge</h1>
+            <h1>Rapport de Mission</h1>
             
-            <div class="menu-label">Noyaux désintégrés (Score)</div>
-            <div id="final-score" class="hud-value" style="font-size: 38px; margin-bottom: 5px;">00000</div>
-            <div id="credits-earned" style="color: #00ffcc; font-size: 12px; font-weight: 700; margin-bottom: 15px;">+0 Nanocrédits</div>
+            <div class="menu-label">Cibles éliminées</div>
+            <div id="final-score" class="hud-value" style="font-size: 42px; margin-bottom: 5px;">00</div>
+            <div id="credits-earned" style="color: #00e5ff; font-size: 13px; font-weight: 700; margin-bottom: 20px;">+0 $ de prime</div>
             
-            <div class="menu-label">Chaîne de destruction : <span id="final-streak" style="color: #fff; font-weight: bold;">0</span></div>
+            <div class="menu-label">Combo maximal : <span id="final-streak" style="color: #fff; font-weight: bold;">0</span></div>
             
-            <button id="second-chance-btn" class="primary-btn" style="border-color: #ff5500; color: #ff5500;">
-                🎬 Injecter un bypass (+30s / +1 Vie)
+            <button id="second-chance-btn" class="primary-btn" style="border-color: #ff6c00; color: #ff6c00;">
+                🎬 Utiliser un gilet pare-balles (+30s / +1 Vie)
             </button>
             
-            <button id="restart-btn" class="secondary-btn" style="margin-top: 15px; padding: 14px;">Retour au terminal</button>
+            <button id="restart-btn" class="secondary-btn" style="margin-top: 15px; padding: 15px;">Mettre à jour le dossier</button>
         </div>
     </div>
 
     <div id="penalty-screen" class="penalty-overlay">
         <div class="penalty-box">
-            <div class="penalty-title">Surcharge Système / REBOOT INITIALISÉ</div>
+            <div class="penalty-title">À Couvert !</div>
+            <div class="penalty-sub">Le syndicat riposte ! Restez caché...</div>
             <div id="penalty-timer" class="penalty-timer">5.0s</div>
             <div class="penalty-progress">
                 <div id="penalty-bar" class="penalty-bar"></div>
@@ -620,22 +638,25 @@
     <div class="hud-layer">
         <div class="hud-header">
             <div class="hud-panel">
-                <span id="hud-label-left" class="menu-label" style="margin:0;">Temps Restant</span>
+                <span id="hud-label-left" class="menu-label" style="margin:0;">Chrono Mission</span>
                 <div id="hud-timer" class="hud-value">00:00</div>
             </div>
             <div class="streak-container">
                 <div id="streak-badge" class="multiplier-badge">X1</div>
             </div>
             <div class="hud-panel" style="text-align: right;">
-                <span class="menu-label" style="margin:0;">Noyaux Éliminés</span>
+                <span class="menu-label" style="margin:0;">Contrats Remplis</span>
                 <div id="hud-score" class="hud-value">00000</div>
             </div>
         </div>
-        <div class="footer-text">Clic gauche / Entrée pour décharger l'impulsion IEM</div>
+        <div class="footer-text">Clic gauche / Entrée pour presser la détente</div>
     </div>
 
     <div id="game-space" class="game-space">
-        <div id="target" class="target"></div>
+        <div id="target" class="target">
+            <div class="target-hat"></div>
+            <div class="target-glasses"></div>
+        </div>
     </div>
 
     <div id="crosshair" class="crosshair">
@@ -649,16 +670,16 @@
 
     <script>
         const SKINS_DATA = [
-            { id: 'cyan', name: 'Matrix Cyan (Defaut)', color: '#00ffcc', cost: 0 },
-            { id: 'gold', name: 'Alerte Spectre', color: '#ffcc00', cost: 250 },
-            { id: 'pink', name: 'Singularité Rose', color: '#ff00ff', cost: 500 },
-            { id: 'acid', name: 'Toxic Core Overlay', color: '#33ff00', cost: 750 }
+            { id: 'cyan', name: 'Laser Cyan (Base)', color: '#00e5ff', cost: 0 },
+            { id: 'gold', name: 'Laser Or Élite', color: '#ffb700', cost: 250 },
+            { id: 'pink', name: 'Spectre Fuchsia', color: '#ff007f', cost: 500 },
+            { id: 'acid', name: 'Viper Toxique', color: '#00ff22', cost: 750 }
         ];
 
-        let userCredits = parseInt(localStorage.getItem('sniper_credits')) || 0;
-        let highScores = JSON.parse(localStorage.getItem('sniper_highscores')) || [];
-        let unlockedSkins = JSON.parse(localStorage.getItem('sniper_skins')) || ['cyan'];
-        let currentSkin = localStorage.getItem('sniper_current_skin') || 'cyan';
+        let userCredits = parseInt(localStorage.getItem('trigger_credits')) || 0;
+        let highScores = JSON.parse(localStorage.getItem('trigger_highscores')) || [];
+        let unlockedSkins = JSON.parse(localStorage.getItem('trigger_skins')) || ['cyan'];
+        let currentSkin = localStorage.getItem('trigger_current_skin') || 'cyan';
 
         let score = 0;
         let streak = 0;
@@ -795,12 +816,12 @@
             updateHudDisplay();
             
             if (gameMode === 'chrono') {
-                hudLabelLeft.textContent = "Temps Restant";
+                hudLabelLeft.textContent = "Chrono Mission";
                 timeLeft = gameTimeAllocated;
                 updateTimerText();
                 launchChronoLoop();
             } else {
-                hudLabelLeft.textContent = "Intégrité Système";
+                hudLabelLeft.textContent = "Santé Agent";
                 survivalLives = 3;
                 updateTimerText();
             }
@@ -811,7 +832,7 @@
             moveTarget();
         }
 
-        /* CORRECTION ICI : Le chrono s'exécute de façon autonome sans être bloqué par l'état d'enrayement */
+        // LE CHRONO FONCTIONNE EN CONTINU MÊME QUAND L'AGENT SE CACHE !
         function launchChronoLoop() {
             gameTimerInterval = setInterval(() => {
                 if (isGameActive) { 
@@ -830,7 +851,7 @@
                 const seconds = timeLeft % 60;
                 hudTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             } else {
-                hudTimer.textContent = "❤️ ".repeat(survivalLives) || "EFFONDREMENT";
+                hudTimer.textContent = "❤️ ".repeat(survivalLives) || "K.O.";
             }
         }
 
@@ -839,7 +860,7 @@
             
             target.classList.remove('active');
             
-            // CONSERVATION DE LA SÉCURITÉ HUD INTERDISE À LA CIBLE (150px du haut)
+            // Barrière physique pour pas que le bonhomme sorte ou se cache sous le HUD
             const paddingSide = 60; 
             const hudSafeZone = 150; 
             
@@ -873,7 +894,7 @@
 
             if (isKeyboard) {
                 const elementAtCursor = document.elementFromPoint(mouseX, mouseY);
-                if (elementAtCursor === target) hitTarget = true;
+                if (elementAtCursor === target || target.contains(elementAtCursor)) hitTarget = true;
             } else {
                 if (e.target === target || target.contains(e.target)) hitTarget = true;
                 posX = e.clientX;
@@ -938,6 +959,7 @@
             triggerPenaltyBlock();
         }
 
+        // SCÉNARISATION DE LA PÉNALITÉ : L'AGENT SE MET À COUVERT
         function triggerPenaltyBlock() {
             isPenalized = true;
             target.classList.remove('active');
@@ -977,7 +999,7 @@
         function updateHudDisplay() {
             hudScore.textContent = String(score).padStart(5, '0');
             if (multiplier > 1) {
-                streakBadge.textContent = `X${multiplier} (${streak} COUPS)`;
+                streakBadge.textContent = `COMBO X${multiplier} (${streak})`;
                 streakBadge.className = 'multiplier-badge active';
             } else {
                 streakBadge.className = 'multiplier-badge';
@@ -993,44 +1015,45 @@
             penaltyScreen.classList.remove('active');
             crosshair.classList.remove('disrupted');
             
+            // Gain d'argent fictif (Primes)
             const earnedCredits = Math.floor(score / 100);
             userCredits += earnedCredits;
-            localStorage.setItem('sniper_credits', userCredits);
+            localStorage.setItem('trigger_credits', userCredits);
 
             saveHighScore(score, gameMode);
 
-            finalScoreText.textContent = String(score).padStart(5, '0');
+            finalScoreText.textContent = String(score / 100);
             finalStreakText.textContent = maxStreak;
-            creditsEarnedText.textContent = `+${earnedCredits} Nanocrédits décodés`;
+            creditsEarnedText.textContent = `+ ${earnedCredits} $ transférés sur votre compte`;
             
             gameoverScreen.classList.remove('hidden');
         }
 
         function saveHighScore(finalScore, mode) {
-            const modeLabel = mode === 'chrono' ? 'Chrono' : 'Survie';
+            const modeLabel = mode === 'chrono' ? 'Nettoyage' : 'Assaut';
             highScores.push({ score: finalScore, mode: modeLabel, date: new Date().toLocaleDateString('fr-FR') });
             highScores.sort((a, b) => b.score - a.score);
             highScores = highScores.slice(0, 3);
-            localStorage.setItem('sniper_highscores', JSON.stringify(highScores));
+            localStorage.setItem('trigger_highscores', JSON.stringify(highScores));
         }
 
         function renderLeaderboard() {
             const container = document.getElementById('leaderboard');
             if (highScores.length === 0) {
-                container.innerHTML = `<div style="text-align:center; color:rgba(255,255,255,0.15); font-size:11px;">Aucune donnée synchronisée</div>`;
+                container.innerHTML = `<div style="text-align:center; color:rgba(255,255,255,0.15); font-size:11px;">Aucun dossier criminel résolu</div>`;
                 return;
             }
             container.innerHTML = highScores.map((row, idx) => `
                 <div class="leaderboard-item">
-                    <span>#${idx+1} [Cyber-${row.mode}] - ${row.date}</span>
-                    <span style="color:#00ffcc; font-weight:bold;">${String(row.score).padStart(5, '0')} Nodes</span>
+                    <span>#${idx+1} [Opération-${row.mode}] - ${row.date}</span>
+                    <span style="color:#00e5ff; font-weight:bold;">${String(row.score / 100)} éliminations</span>
                 </div>
             `).join('');
         }
 
         function updateHubCreditsDisplay() {
-            document.getElementById('hub-credits').textContent = userCredits;
-            document.getElementById('shop-credits').textContent = userCredits;
+            document.getElementById('hub-credits').textContent = `${userCredits} $`;
+            document.getElementById('shop-credits').textContent = `${userCredits} $`;
         }
 
         function buildShopUI() {
@@ -1039,9 +1062,9 @@
                 const isUnlocked = unlockedSkins.includes(skin.id);
                 const isEquipped = currentSkin === skin.id;
                 
-                let actionText = `<span class="skin-cost">${skin.cost} Cr.</span>`;
+                let actionText = `<span class="skin-cost">${skin.cost} $</span>`;
                 if (isUnlocked) {
-                    actionText = isEquipped ? `<span style="color:#00ffcc; font-size:11px;">ACTIF</span>` : `<span style="color:rgba(255,255,255,0.3); font-size:11px;">DISPO</span>`;
+                    actionText = isEquipped ? `<span style="color:#00e5ff; font-size:11px;">OPÉRATIONNEL</span>` : `<span style="color:rgba(255,255,255,0.3); font-size:11px;">DISPONIBLE</span>`;
                 }
 
                 return `
@@ -1060,7 +1083,7 @@
 
             if (isUnlocked) {
                 currentSkin = id;
-                localStorage.setItem('sniper_current_skin', id);
+                localStorage.setItem('trigger_current_skin', id);
                 applySkinProperties(id);
             } else {
                 if (userCredits >= skin.cost) {
@@ -1068,14 +1091,14 @@
                     unlockedSkins.push(id);
                     currentSkin = id;
                     
-                    localStorage.setItem('sniper_credits', userCredits);
-                    localStorage.setItem('sniper_skins', JSON.stringify(unlockedSkins));
-                    localStorage.setItem('sniper_current_skin', id);
+                    localStorage.setItem('trigger_credits', userCredits);
+                    localStorage.setItem('trigger_skins', JSON.stringify(unlockedSkins));
+                    localStorage.setItem('trigger_current_skin', id);
                     
                     applySkinProperties(id);
                     updateHubCreditsDisplay();
                 } else {
-                    alert("Volume de nanocrédits insuffisant pour décrypter ce profil visuel.");
+                    alert("Fonds insuffisants pour équiper ce pointeur laser.");
                 }
             }
             buildShopUI();
@@ -1085,7 +1108,7 @@
             const skin = SKINS_DATA.find(s => s.id === id) || SKINS_DATA[0];
             document.documentElement.style.setProperty('--accent-cyan', skin.color);
             const rgb = hexToRgb(skin.color);
-            document.documentElement.style.setProperty('--accent-glow', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`);
+            document.documentElement.style.setProperty('--accent-glow', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`);
         }
 
         function hexToRgb(hex) {
@@ -1094,7 +1117,7 @@
                 r: parseInt(result[1], 16),
                 g: parseInt(result[2], 16),
                 b: parseInt(result[3], 16)
-            } : { r: 0, g: 255, b: 204 };
+            } : { r: 0, g: 229, b: 255 };
         }
     </script>
 </body>
