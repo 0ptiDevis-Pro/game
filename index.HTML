@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.N.I.P.E.R. - Tactical Aim Trainer Pro</title>
+    <title>KORTEX // Rogue AI Core Eliminator</title>
     <style>
         :root {
-            --bg-color: #05080c;
-            --accent-cyan: #00ffcc; /* Dynamique selon le skin */
+            --bg-color: #04060a;
+            --accent-cyan: #00ffcc; 
             --accent-glow: rgba(0, 255, 204, 0.3);
-            --target-red: #ff3366;
-            --target-glow: rgba(255, 51, 102, 0.5);
+            --target-red: #ff2a5f;
+            --target-glow: rgba(255, 42, 95, 0.6);
             --penalty-orange: #ff5500;
-            --ui-bg: rgba(10, 16, 26, 0.9);
-            --border-style: 1px solid rgba(255, 255, 255, 0.08);
+            --ui-bg: rgba(7, 11, 19, 0.92);
+            --border-style: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         * {
@@ -32,15 +32,15 @@
             cursor: none;
         }
 
-        /* Grille tactique */
+        /* Grille matrice tactique */
         .bg-grid {
             position: absolute;
             width: 100%;
             height: 100%;
             background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-            background-size: 50px 50px;
+                linear-gradient(rgba(0, 255, 204, 0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 204, 0.01) 1px, transparent 1px);
+            background-size: 40px 40px;
             z-index: 1;
         }
 
@@ -51,7 +51,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(4, 6, 10, 0.96);
+            background: rgba(3, 5, 8, 0.97);
             backdrop-filter: blur(20px);
             z-index: 500;
             display: flex;
@@ -72,36 +72,46 @@
             border: var(--border-style);
             padding: 35px;
             border-radius: 16px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.9);
             text-align: center;
             max-width: 500px;
             width: 95%;
-            max-height: 90vh;
+            max-height: 95vh;
             overflow-y: auto;
         }
 
         .menu-card h1 {
             color: #fff;
-            font-size: 26px;
-            letter-spacing: 6px;
+            font-size: 28px;
+            letter-spacing: 8px;
             text-transform: uppercase;
-            margin-bottom: 25px;
+            margin-bottom: 5px;
             font-weight: 900;
             background: linear-gradient(45deg, #fff, var(--accent-cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
+        .lore-summary {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.5;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+            padding-bottom: 15px;
+        }
+
         .menu-label {
             color: rgba(255,255,255,0.4);
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 12px;
             margin-top: 15px;
         }
 
-        /* Selecteurs de Modes & Temps */
+        /* Sélecteurs */
         .selector-row {
             display: flex;
             justify-content: space-between;
@@ -111,16 +121,17 @@
 
         .toggle-btn {
             flex: 1;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.6);
             padding: 12px 6px;
             border-radius: 8px;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             transition: all 0.2s ease;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .toggle-btn:hover, .toggle-btn.active {
@@ -128,6 +139,7 @@
             color: var(--bg-color);
             box-shadow: 0 0 15px var(--accent-glow);
             border-color: var(--accent-cyan);
+            font-weight: 800;
         }
 
         .primary-btn {
@@ -153,9 +165,9 @@
         }
 
         .secondary-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #ccc;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #aaa;
             width: 100%;
             padding: 12px;
             border-radius: 8px;
@@ -168,11 +180,11 @@
             transition: all 0.2s ease;
         }
         .secondary-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             color: #fff;
         }
 
-        /* --- SYSTÈME DE BOUTIQUE (SKINS) --- */
+        /* --- BOUTIQUE --- */
         .shop-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -181,8 +193,8 @@
         }
 
         .shop-item {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.06);
             border-radius: 8px;
             padding: 12px;
             text-align: center;
@@ -191,18 +203,18 @@
         }
 
         .shop-item:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.15);
         }
 
         .shop-item.equipped {
             border-color: var(--accent-cyan);
-            background: rgba(0, 255, 204, 0.05);
+            background: rgba(0, 255, 204, 0.04);
         }
 
         .skin-preview {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             margin: 0 auto 8px auto;
             box-shadow: 0 0 10px currentColor;
@@ -225,11 +237,11 @@
         .stats-display {
             display: flex;
             justify-content: space-around;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 15px;
-            border: 1px solid rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.02);
         }
 
         .leaderboard-list {
@@ -238,13 +250,13 @@
             padding: 10px 15px;
             border-radius: 8px;
             font-size: 12px;
-            color: #ddd;
+            color: #ccc;
         }
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
         }
         .leaderboard-item:last-child { border: none; }
 
@@ -281,7 +293,7 @@
             color: #fff;
             display: flex;
             flex-direction: column;
-            min-width: 160px;
+            min-width: 170px;
         }
 
         .hud-value {
@@ -300,7 +312,7 @@
         }
 
         .multiplier-badge {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 900;
             color: #fff;
             background: linear-gradient(135deg, var(--target-red), var(--penalty-orange));
@@ -324,7 +336,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 30, 0, 0.15); 
+            background: rgba(255, 30, 0, 0.12); 
             z-index: 400; 
             display: flex;
             justify-content: center;
@@ -341,12 +353,12 @@
         }
 
         .penalty-box {
-            background: #140805;
+            background: #0f0503;
             border: 1px solid var(--penalty-orange);
             padding: 30px 60px;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 0 50px rgba(255, 85, 0, 0.3);
+            box-shadow: 0 0 50px rgba(255, 85, 0, 0.25);
             transform: translateY(15px);
             transition: transform 0.25s ease;
         }
@@ -388,7 +400,7 @@
             transform: scaleX(1);
         }
 
-        /* --- ZONE DE JEU, CIBLE & VISEUR --- */
+        /* --- ZONE DE JEU & DESIGN SCI-FI DES CIBLES --- */
         .game-space {
             position: absolute;
             width: 100%;
@@ -396,22 +408,53 @@
             z-index: 5;
         }
 
+        /* Conteneur physique de la cible (gère la position et l'apparition) */
         .target {
             position: absolute;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #fff 15%, transparent 20%, var(--target-red) 25%, transparent 35%, var(--target-red) 65%);
-            box-shadow: 0 0 30px var(--target-glow);
+            width: 52px;
+            height: 52px;
             transform: translate(-50%, -50%) scale(0);
-            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .target.active {
             transform: translate(-50%, -50%) scale(1);
         }
 
+        /* Le Noyau Énergétique Central de l'IA (Plasma) */
+        .target::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff 20%, var(--target-red) 60%, transparent 100%);
+            box-shadow: 0 0 25px 8px var(--target-glow);
+            z-index: 2;
+        }
+
+        /* L'anneau technologique de verrouillage rotatif */
+        .target::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px dashed var(--target-red);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--target-glow);
+            animation: core-spin 4s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes core-spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- VISEUR PREMIUM --- */
         .crosshair {
             position: fixed;
             width: 50px;
@@ -461,7 +504,7 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.06);
             opacity: 0;
             pointer-events: none;
             z-index: 2;
@@ -481,7 +524,7 @@
 
         .footer-text {
             text-align: center;
-            color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.15);
             font-size: 10px;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -495,23 +538,26 @@
 
     <div id="setup-screen" class="screen-overlay">
         <div class="menu-card">
-            <h1>S.N.I.P.E.R. Suite</h1>
+            <h1>KORTEX // DESTRUCT</h1>
+            <div class="lore-summary">
+                ALERTE : Sécurité du Mainframe compromise. Des noyaux d'I.A. autonomes (Rogue Cores) se dupliquent en tâche de fond. Purgez la grille avant saturation complète du système.
+            </div>
             
             <div class="stats-display">
                 <div>
-                    <div style="font-size:10px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Nanocrédits</div>
+                    <div style="font-size:9px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing: 1px;">Nanocrédits réseaux</div>
                     <div id="hub-credits" style="color:#00ffcc; font-weight:800; font-size:18px;">0</div>
                 </div>
             </div>
 
-            <div class="menu-label">Mode d'entraînement</div>
+            <div class="menu-label">Mode d'interception</div>
             <div class="selector-row">
-                <button class="toggle-btn active" id="mode-chrono-btn">Chronometré</button>
-                <button class="toggle-btn" id="mode-survival-btn">Survie (3 Vies)</button>
+                <button class="toggle-btn active" id="mode-chrono-btn">Contre-la-montre</button>
+                <button class="toggle-btn" id="mode-survival-btn">Survie Réseau (3 Vies)</button>
             </div>
 
             <div id="time-selector-wrapper">
-                <div class="menu-label">Durée de la simulation</div>
+                <div class="menu-label">Fenêtre de scan temporel</div>
                 <div class="selector-row">
                     <button class="time-btn toggle-btn active" data-time="60">1 Min</button>
                     <button class="time-btn toggle-btn" data-time="120">2 Min</button>
@@ -519,53 +565,51 @@
                 </div>
             </div>
 
-            <div class="menu-label">Meilleurs Scores Locaux</div>
-            <div id="leaderboard" class="leaderboard-list">
-                </div>
+            <div class="menu-label">Meilleures performances mémorisées</div>
+            <div id="leaderboard" class="leaderboard-list"></div>
 
-            <button id="start-btn" class="primary-btn">Lancer l'exercice</button>
-            <button id="open-shop-btn" class="secondary-btn">Ouvrir la Boutique de Viseurs</button>
+            <button id="start-btn" class="primary-btn">Initialiser la purge</button>
+            <button id="open-shop-btn" class="secondary-btn">Optimiser les optiques (Boutique)</button>
         </div>
     </div>
 
     <div id="shop-screen" class="screen-overlay hidden">
         <div class="menu-card">
-            <h1>Armurerie Tactique</h1>
+            <h1>Filtres Optiques</h1>
             <div class="stats-display">
                 <div>
-                    <div style="font-size:10px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Tes Crédits disponibles</div>
+                    <div style="font-size:10px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Crédits décryptés</div>
                     <div id="shop-credits" style="color:#00ffcc; font-weight:800; font-size:18px;">0</div>
                 </div>
             </div>
 
-            <div class="shop-grid" id="shop-items-container">
-                </div>
+            <div class="shop-grid" id="shop-items-container"></div>
 
-            <button id="close-shop-btn" class="primary-btn">Retour au Menu</button>
+            <button id="close-shop-btn" class="primary-btn">Fermer la console</button>
         </div>
     </div>
 
     <div id="gameover-screen" class="screen-overlay hidden">
         <div class="menu-card">
-            <h1>Exercice Terminé</h1>
+            <h1>Analyse Post-Purge</h1>
             
-            <div class="menu-label">Score de la session</div>
+            <div class="menu-label">Noyaux désintégrés (Score)</div>
             <div id="final-score" class="hud-value" style="font-size: 38px; margin-bottom: 5px;">00000</div>
-            <div id="credits-earned" style="color: #00ffcc; font-size: 12px; font-weight: 700; margin-bottom: 15px;">+0 Nanocrédits gagnés</div>
+            <div id="credits-earned" style="color: #00ffcc; font-size: 12px; font-weight: 700; margin-bottom: 15px;">+0 Nanocrédits</div>
             
-            <div class="menu-label">Série Maximale : <span id="final-streak" style="color: #fff; font-weight: bold;">0</span></div>
+            <div class="menu-label">Chaîne de destruction : <span id="final-streak" style="color: #fff; font-weight: bold;">0</span></div>
             
             <button id="second-chance-btn" class="primary-btn" style="border-color: #ff5500; color: #ff5500;">
-                🎬 Seconde Chance (+30s / +1 Vie)
+                🎬 Injecter un bypass (+30s / +1 Vie)
             </button>
             
-            <button id="restart-btn" class="secondary-btn" style="margin-top: 15px; padding: 14px;">Quitter et Sauvegarder</button>
+            <button id="restart-btn" class="secondary-btn" style="margin-top: 15px; padding: 14px;">Retour au terminal</button>
         </div>
     </div>
 
     <div id="penalty-screen" class="penalty-overlay">
         <div class="penalty-box">
-            <div class="penalty-title">Système Enrayé / Surchauffe</div>
+            <div class="penalty-title">Surcharge Système / REBOOT INITIALISÉ</div>
             <div id="penalty-timer" class="penalty-timer">5.0s</div>
             <div class="penalty-progress">
                 <div id="penalty-bar" class="penalty-bar"></div>
@@ -583,11 +627,11 @@
                 <div id="streak-badge" class="multiplier-badge">X1</div>
             </div>
             <div class="hud-panel" style="text-align: right;">
-                <span class="menu-label" style="margin:0;">Score Actuel</span>
+                <span class="menu-label" style="margin:0;">Noyaux Éliminés</span>
                 <div id="hud-score" class="hud-value">00000</div>
             </div>
         </div>
-        <div class="footer-text">Clic Gauche / Pavé Tactile / Touche Entrée pour faire feu</div>
+        <div class="footer-text">Clic gauche / Entrée pour décharger l'impulsion IEM</div>
     </div>
 
     <div id="game-space" class="game-space">
@@ -604,26 +648,23 @@
     </div>
 
     <script>
-        // Configuration de la boutique de Skins
         const SKINS_DATA = [
-            { id: 'cyan', name: 'Cyber Cyan (Default)', color: '#00ffcc', cost: 0 },
-            { id: 'gold', name: 'Or Tactique', color: '#ffcc00', cost: 250 },
-            { id: 'pink', name: 'Rose Néon', color: '#ff00ff', cost: 500 },
-            { id: 'acid', name: 'Vert Toxique', color: '#33ff00', cost: 750 }
+            { id: 'cyan', name: 'Matrix Cyan (Defaut)', color: '#00ffcc', cost: 0 },
+            { id: 'gold', name: 'Alerte Spectre', color: '#ffcc00', cost: 250 },
+            { id: 'pink', name: 'Singularité Rose', color: '#ff00ff', cost: 500 },
+            { id: 'acid', name: 'Toxic Core Overlay', color: '#33ff00', cost: 750 }
         ];
 
-        // États de jeu globaux sauvegardés localement
         let userCredits = parseInt(localStorage.getItem('sniper_credits')) || 0;
         let highScores = JSON.parse(localStorage.getItem('sniper_highscores')) || [];
         let unlockedSkins = JSON.parse(localStorage.getItem('sniper_skins')) || ['cyan'];
         let currentSkin = localStorage.getItem('sniper_current_skin') || 'cyan';
 
-        // Variables de session de jeu
         let score = 0;
         let streak = 0;
         let maxStreak = 0;
         let multiplier = 1;
-        let gameMode = 'chrono'; // 'chrono' ou 'survival'
+        let gameMode = 'chrono'; 
         let gameTimeAllocated = 60; 
         let timeLeft = 0;
         let survivalLives = 3;
@@ -638,7 +679,6 @@
         let mouseX = 0;
         let mouseY = 0;
 
-        // Éléments DOM
         const crosshair = document.getElementById('crosshair');
         const target = document.getElementById('target');
         const gameSpace = document.getElementById('game-space');
@@ -660,7 +700,6 @@
         const creditsEarnedText = document.getElementById('credits-earned');
         const secondChanceBtn = document.getElementById('second-chance-btn');
 
-        // Initialisation de l'application
         window.addEventListener('DOMContentLoaded', () => {
             applySkinProperties(currentSkin);
             renderLeaderboard();
@@ -668,7 +707,6 @@
             buildShopUI();
         });
 
-        // Suivi ultra-fluide des coordonnées de la souris
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
@@ -678,7 +716,6 @@
             });
         });
 
-        /* --- LOGIQUE INTERFACE MENUS ET CONFIGURATIONS --- */
         document.getElementById('mode-chrono-btn').addEventListener('click', () => {
             gameMode = 'chrono';
             document.getElementById('mode-chrono-btn').classList.add('active');
@@ -708,7 +745,6 @@
             renderLeaderboard();
         });
 
-        // Navigation boutique
         document.getElementById('open-shop-btn').addEventListener('click', () => {
             setupScreen.classList.add('hidden');
             shopScreen.classList.remove('hidden');
@@ -720,26 +756,20 @@
             updateHubCreditsDisplay();
         });
 
-        /* --- ACTIONS MONÉTISATION INDIRECTE : SECONDE CHANCE --- */
         secondChanceBtn.addEventListener('click', () => {
             if (hasUsedSecondChance) return;
             
-            // NOTE IMPORTANTE POUR TOI : C'est ici qu'on branchera l'appel de pub vidéo plus tard.
-            // Exemple : AdSdk.showRewardVideo().then(() => triggerResume());
-            
             hasUsedSecondChance = true;
             secondChanceBtn.style.display = 'none'; 
-            
-            // Résurrection
             isGameActive = true;
             gameoverScreen.classList.add('hidden');
             
             if (gameMode === 'chrono') {
-                timeLeft = 30; // Offre 30 secondes bonus
+                timeLeft = 30; 
                 updateTimerText();
                 launchChronoLoop();
             } else {
-                survivalLives = 1; // Redonne une vie de secours
+                survivalLives = 1; 
                 updateTimerText();
             }
             
@@ -749,8 +779,6 @@
             moveTarget();
         });
 
-
-        /* --- BOUCLES ET MOTEUR DE JEU --- */
         function startGame() {
             clearInterval(gameTimerInterval);
             clearInterval(penaltyInterval);
@@ -780,13 +808,13 @@
             setupScreen.classList.add('hidden');
             penaltyScreen.classList.remove('active');
             crosshair.classList.remove('disrupted');
-
             moveTarget();
         }
 
+        /* CORRECTION ICI : Le chrono s'exécute de façon autonome sans être bloqué par l'état d'enrayement */
         function launchChronoLoop() {
             gameTimerInterval = setInterval(() => {
-                if (isGameActive && !isPenalized) {
+                if (isGameActive) { 
                     timeLeft--;
                     updateTimerText();
                     if (timeLeft <= 0) {
@@ -802,8 +830,7 @@
                 const seconds = timeLeft % 60;
                 hudTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             } else {
-                // Version graphique avec des cœurs / barres d'énergie pour la Survie
-                hudTimer.textContent = "❤️ ".repeat(survivalLives) || "DÉFAILLANCE";
+                hudTimer.textContent = "❤️ ".repeat(survivalLives) || "EFFONDREMENT";
             }
         }
 
@@ -812,7 +839,7 @@
             
             target.classList.remove('active');
             
-            // ZONE DE SÉCURITÉ CONSERVÉE (Exclusion absolue de la barre supérieure du HUD)
+            // CONSERVATION DE LA SÉCURITÉ HUD INTERDISE À LA CIBLE (150px du haut)
             const paddingSide = 60; 
             const hudSafeZone = 150; 
             
@@ -832,7 +859,6 @@
             }, 60);
         }
 
-        /* --- SYSTÈME RECONNAISSANCE DES INPUTS --- */
         function processShot(e, isKeyboard = false) {
             if (!isGameActive || isPenalized) return;
             if (e && e.target.closest('.screen-overlay')) return; 
@@ -849,7 +875,7 @@
                 const elementAtCursor = document.elementFromPoint(mouseX, mouseY);
                 if (elementAtCursor === target) hitTarget = true;
             } else {
-                if (e.target === target) hitTarget = true;
+                if (e.target === target || target.contains(e.target)) hitTarget = true;
                 posX = e.clientX;
                 posY = e.clientY;
             }
@@ -874,7 +900,6 @@
             }
         });
 
-        /* --- LOGIQUE DE JEU : IMPACT / ÉCHEC --- */
         function handleHit(x, y) {
             streak++;
             if (streak > maxStreak) maxStreak = streak;
@@ -913,7 +938,6 @@
             triggerPenaltyBlock();
         }
 
-        /* --- BLOCAGE PHYSIQUE ET VISUEL DE L'ÉCRAN --- */
         function triggerPenaltyBlock() {
             isPenalized = true;
             target.classList.remove('active');
@@ -953,14 +977,13 @@
         function updateHudDisplay() {
             hudScore.textContent = String(score).padStart(5, '0');
             if (multiplier > 1) {
-                streakBadge.textContent = `X${multiplier} (${streak} SÉRIE)`;
+                streakBadge.textContent = `X${multiplier} (${streak} COUPS)`;
                 streakBadge.className = 'multiplier-badge active';
             } else {
                 streakBadge.className = 'multiplier-badge';
             }
         }
 
-        /* --- SAUVEGARDES, HIGH SCORES ET MONNAIE --- */
         function endGame() {
             isGameActive = false;
             clearInterval(gameTimerInterval);
@@ -970,18 +993,15 @@
             penaltyScreen.classList.remove('active');
             crosshair.classList.remove('disrupted');
             
-            // Calcul conversion de monnaie (100 pts = 1 crédit)
             const earnedCredits = Math.floor(score / 100);
             userCredits += earnedCredits;
             localStorage.setItem('sniper_credits', userCredits);
 
-            // Gestion du tableau des scores locaux
             saveHighScore(score, gameMode);
 
-            // Affichage UI de fin
             finalScoreText.textContent = String(score).padStart(5, '0');
             finalStreakText.textContent = maxStreak;
-            creditsEarnedText.textContent = `+${earnedCredits} Nanocrédits convertis`;
+            creditsEarnedText.textContent = `+${earnedCredits} Nanocrédits décodés`;
             
             gameoverScreen.classList.remove('hidden');
         }
@@ -989,9 +1009,7 @@
         function saveHighScore(finalScore, mode) {
             const modeLabel = mode === 'chrono' ? 'Chrono' : 'Survie';
             highScores.push({ score: finalScore, mode: modeLabel, date: new Date().toLocaleDateString('fr-FR') });
-            // Tri décroissant
             highScores.sort((a, b) => b.score - a.score);
-            // On garde le top 3
             highScores = highScores.slice(0, 3);
             localStorage.setItem('sniper_highscores', JSON.stringify(highScores));
         }
@@ -999,13 +1017,13 @@
         function renderLeaderboard() {
             const container = document.getElementById('leaderboard');
             if (highScores.length === 0) {
-                container.innerHTML = `<div style="text-align:center; color:rgba(255,255,255,0.2);">Aucune simulation enregistrée</div>`;
+                container.innerHTML = `<div style="text-align:center; color:rgba(255,255,255,0.15); font-size:11px;">Aucune donnée synchronisée</div>`;
                 return;
             }
             container.innerHTML = highScores.map((row, idx) => `
                 <div class="leaderboard-item">
-                    <span>#${idx+1} [${row.mode}] - ${row.date}</span>
-                    <span style="color:#00ffcc; font-weight:bold;">${String(row.score).padStart(5, '0')} pts</span>
+                    <span>#${idx+1} [Cyber-${row.mode}] - ${row.date}</span>
+                    <span style="color:#00ffcc; font-weight:bold;">${String(row.score).padStart(5, '0')} Nodes</span>
                 </div>
             `).join('');
         }
@@ -1015,16 +1033,15 @@
             document.getElementById('shop-credits').textContent = userCredits;
         }
 
-        /* --- ENGINE DE CUSTOMISATION (BOUTIQUE DE SKINS) --- */
         function buildShopUI() {
             const container = document.getElementById('shop-items-container');
             container.innerHTML = SKINS_DATA.map(skin => {
                 const isUnlocked = unlockedSkins.includes(skin.id);
                 const isEquipped = currentSkin === skin.id;
                 
-                let actionText = `<span class="skin-cost">${skin.cost} Credits</span>`;
+                let actionText = `<span class="skin-cost">${skin.cost} Cr.</span>`;
                 if (isUnlocked) {
-                    actionText = isEquipped ? `<span style="color:#00ffcc; font-size:11px;">ÉQUIPÉ</span>` : `<span style="color:rgba(255,255,255,0.4); font-size:11px;">POSSÉDÉ</span>`;
+                    actionText = isEquipped ? `<span style="color:#00ffcc; font-size:11px;">ACTIF</span>` : `<span style="color:rgba(255,255,255,0.3); font-size:11px;">DISPO</span>`;
                 }
 
                 return `
@@ -1042,12 +1059,10 @@
             const isUnlocked = unlockedSkins.includes(id);
 
             if (isUnlocked) {
-                // Équiper le skin directement
                 currentSkin = id;
                 localStorage.setItem('sniper_current_skin', id);
                 applySkinProperties(id);
             } else {
-                // Tenter l'achat
                 if (userCredits >= skin.cost) {
                     userCredits -= skin.cost;
                     unlockedSkins.push(id);
@@ -1060,7 +1075,7 @@
                     applySkinProperties(id);
                     updateHubCreditsDisplay();
                 } else {
-                    alert("Nanocrédits insuffisants pour acquérir ce module optique !");
+                    alert("Volume de nanocrédits insuffisant pour décrypter ce profil visuel.");
                 }
             }
             buildShopUI();
@@ -1069,7 +1084,6 @@
         function applySkinProperties(id) {
             const skin = SKINS_DATA.find(s => s.id === id) || SKINS_DATA[0];
             document.documentElement.style.setProperty('--accent-cyan', skin.color);
-            // Recalcul de la lueur dynamique
             const rgb = hexToRgb(skin.color);
             document.documentElement.style.setProperty('--accent-glow', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`);
         }
