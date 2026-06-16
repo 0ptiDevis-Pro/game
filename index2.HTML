@@ -16,7 +16,6 @@
             --border-style: 1px solid rgba(255, 255, 255, 0.05);
             --building-color: #191e26; 
             --window-color: rgba(12, 15, 20, 0.95);  
-            --window-light: rgba(255, 230, 170, 0.15); /* Éclairage tamisé ultra-réaliste */
         }
 
         * {
@@ -43,17 +42,16 @@
             z-index: 1;
             display: flex;
             justify-content: center;
-            align-items: center; /* Centrage global */
+            align-items: center;
             background: radial-gradient(circle at 50% 40%, #0d131f 0%, #04060a 100%);
         }
 
         .building {
             width: min(92%, 560px);
-            height: 78vh; /* Légèrement réduit pour garantir la visibilité sur petits écrans */
+            height: 78vh;
             position: relative;
-            bottom: 2vh; /* Déplacé vers le haut pour éviter d'être coupé par le bas */
+            bottom: 2vh;
             background-color: var(--building-color);
-            /* Texture de plaques de béton modernes */
             background-image: 
                 linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
@@ -61,8 +59,8 @@
             border-radius: 12px;
             padding: 24px;
             display: grid;
-            grid-template-columns: repeat(6, 1fr); /* 6 Colonnes */
-            grid-template-rows: repeat(7, 1fr);    /* 7 Rangées = 42 Fenêtres */
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(7, 1fr);
             gap: 12px;
             box-shadow: 
                 0 40px 100px rgba(0,0,0,0.9), 
@@ -71,7 +69,7 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        /* Fenêtres format portrait réaliste */
+        /* Fenêtres sans lumières (Full Furtif) */
         .window {
             background-color: var(--window-color);
             border-radius: 4px;
@@ -79,13 +77,11 @@
             overflow: hidden;
             aspect-ratio: 1 / 1.45;
             border: 1px solid rgba(0, 0, 0, 0.6);
-            /* Ombre interne simulant la profondeur de la pièce */
             box-shadow: 
                 inset 0 4px 12px rgba(0,0,0,0.95),
                 bottom 2px 0 rgba(255,255,255,0.05); 
         }
 
-        /* Rebord/Appui de fenêtre en relief pour le réalisme */
         .window::after {
             content: '';
             position: absolute;
@@ -95,7 +91,6 @@
             z-index: 15;
         }
 
-        /* Rendu réaliste des stores intérieurs */
         .window-blind {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -106,33 +101,38 @@
             z-index: 2;
         }
 
-        /* Fenêtres avec lumière tamisée réaliste (pas de gros blocs blancs/jaunes flash) */
-        .window.lit {
-            background-color: #1a1e26;
-            box-shadow: inset 0 0 20px rgba(255, 213, 107, 0.12), inset 0 4px 12px rgba(0,0,0,0.8);
-        }
-        .window.lit .window-blind {
-            background: linear-gradient(rgba(255, 213, 107, 0.05) 50%, transparent 50%);
-            background-size: 100% 4px;
-            opacity: 1;
-        }
-
-        /* --- STYLING DES ASSASSINS (ANCRÉS ET PROPORTIONNÉS) --- */
+        /* --- STYLING DES ASSASSINS EN MOUVEMENT --- */
         .target {
             position: absolute;
             width: 42px;      
             height: 64px;     
-            bottom: 3px; /* Juste au-dessus du rebord de la fenêtre */
-            left: 50%;
-            transform: translateX(-50%) scale(0);
+            bottom: 3px; 
+            left: -50px; /* Démarre caché à l'extérieur de la vitre */
             transform-origin: bottom center;
-            transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
-            pointer-events: auto;
+            pointer-events: none;
             z-index: 10;
+            display: none;
         }
 
+        /* Animations de déplacement horizontal */
         .target.active {
-            transform: translateX(-50%) scale(1);
+            display: block;
+            pointer-events: auto;
+            animation: walkAcross 1.8s linear forwards;
+        }
+
+        .target.active.reverse {
+            animation: walkAcrossReverse 1.8s linear forwards;
+        }
+
+        @keyframes walkAcross {
+            0% { left: -45px; transform: scaleX(1); }
+            100% { left: calc(100% + 10px); transform: scaleX(1); }
+        }
+
+        @keyframes walkAcrossReverse {
+            0% { left: calc(100% + 10px); transform: scaleX(-1); }
+            100% { left: -45px; transform: scaleX(-1); }
         }
 
         /* Silhouette / Costume */
@@ -145,7 +145,6 @@
             box-shadow: 0 0 8px rgba(255, 35, 83, 0.25);
         }
 
-        /* Cravate rouge lumineuse Johnny Trigger */
         .target-tie {
             position: absolute;
             top: 0; left: 50%; transform: translateX(-50%);
@@ -154,7 +153,6 @@
             box-shadow: 0 0 6px var(--target-red);
         }
 
-        /* Tête */
         .target-head {
             position: absolute;
             top: 12px; left: 50%; transform: translateX(-50%);
@@ -164,93 +162,40 @@
             border-radius: 50%;
         }
 
-        /* Lunettes Blanches */
         .target-glasses {
             position: absolute;
             top: 5px; left: 50%; transform: translateX(-50%);
             display: flex; gap: 2px; width: 14px;
         }
         .target-glasses::before, .target-glasses::after {
-            content: '';
-            width: 6px; height: 4px;
-            background: #ffffff;
-            border-radius: 1px 1px 2px 2px;
-            box-shadow: 0 0 6px #ffffff;
+            content: ''; width: 6px; height: 4px; background: #ffffff;
+            border-radius: 1px 1px 2px 2px; box-shadow: 0 0 6px #ffffff;
         }
 
-        /* Chapeau Fedora */
         .target-hat {
             position: absolute;
             top: 4px; left: 50%; transform: translateX(-50%);
-            width: 28px; height: 3px;
-            background: var(--target-red);
-            border-radius: 2px;
-            box-shadow: 0 0 8px var(--target-red);
+            width: 28px; height: 3px; background: var(--target-red);
+            border-radius: 2px; box-shadow: 0 0 8px var(--target-red);
         }
         .target-hat::before {
-            content: '';
-            position: absolute;
-            bottom: 2px; left: 5px;
-            width: 18px; height: 6px;
-            background: #11131a;
-            border: 2px solid var(--target-red);
-            border-bottom: none;
+            content: ''; position: absolute; bottom: 2px; left: 5px;
+            width: 18px; height: 6px; background: #11131a;
+            border: 2px solid var(--target-red); border-bottom: none;
             border-radius: 3px 3px 0 0;
         }
 
         /* --- DESIGN INTERFACE MENUS --- */
-        .screen-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(3, 5, 8, 0.97);
-            backdrop-filter: blur(20px);
-            z-index: 500;
-            display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-
-        .screen-overlay.hidden {
-            opacity: 0; pointer-events: none; transform: scale(1.02);
-        }
-
-        .menu-card {
-            background: var(--ui-bg);
-            border: var(--border-style);
-            padding: 35px;
-            border-radius: 20px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.9);
-            text-align: center;
-            max-width: 450px;
-            width: 92%;
-        }
-
-        .menu-card h1 {
-            color: #fff; font-size: 28px; letter-spacing: 4px;
-            text-transform: uppercase; margin-bottom: 8px; font-weight: 900;
-            background: linear-gradient(135deg, #fff 40%, var(--accent-cyan));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-
+        .screen-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3, 5, 8, 0.97); backdrop-filter: blur(20px); z-index: 500; display: flex; justify-content: center; align-items: center; transition: opacity 0.2s ease, transform 0.2s ease; }
+        .screen-overlay.hidden { opacity: 0; pointer-events: none; transform: scale(1.02); }
+        .menu-card { background: var(--ui-bg); border: var(--border-style); padding: 35px; border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.9); text-align: center; max-width: 450px; width: 92%; }
+        .menu-card h1 { color: #fff; font-size: 28px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 8px; font-weight: 900; background: linear-gradient(135deg, #fff 40%, var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .lore-summary { font-size: 13px; color: rgba(255, 255, 255, 0.4); line-height: 1.6; margin-bottom: 20px; }
         .menu-label { color: rgba(255,255,255,0.25); font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin: 15px 0 10px 0; }
         .selector-row { display: flex; gap: 10px; margin-bottom: 12px; }
-
-        .toggle-btn {
-            flex: 1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.6); padding: 13px; border-radius: 10px;
-            font-weight: 700; font-size: 11px; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase;
-        }
-
-        .toggle-btn:hover, .toggle-btn.active {
-            background: var(--accent-cyan); color: #000; box-shadow: 0 0 20px var(--accent-glow); border-color: var(--accent-cyan);
-        }
-
-        .primary-btn {
-            width: 100%; background: transparent; border: 2px solid var(--accent-cyan); color: var(--accent-cyan);
-            padding: 15px; border-radius: 10px; font-size: 13px; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.2s ease; margin-top: 15px;
-        }
-
+        .toggle-btn { flex: 1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.6); padding: 13px; border-radius: 10px; font-weight: 700; font-size: 11px; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; }
+        .toggle-btn:hover, .toggle-btn.active { background: var(--accent-cyan); color: #000; box-shadow: 0 0 20px var(--accent-glow); border-color: var(--accent-cyan); }
+        .primary-btn { width: 100%; background: transparent; border: 2px solid var(--accent-cyan); color: var(--accent-cyan); padding: 15px; border-radius: 10px; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.2s ease; margin-top: 15px; }
         .primary-btn:hover { background: var(--accent-cyan); color: #000; box-shadow: 0 0 25px var(--accent-glow); }
         .secondary-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); color: #aaa; width: 100%; padding: 12px; border-radius: 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer; margin-top: 10px; }
 
@@ -261,7 +206,7 @@
         .skin-preview { width: 12px; height: 12px; border-radius: 50%; margin: 0 auto 8px auto; box-shadow: 0 0 10px currentColor; }
         .skin-cost { font-size: 11px; color: var(--accent-cyan); font-weight: 700; display: block; margin-top: 4px; }
 
-        /* --- RIAPOSTE / COUVERTURE --- */
+        /* --- RIPOSTE / COUVERTURE --- */
         .penalty-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 35, 83, 0.05); z-index: 400; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.1s ease; }
         .penalty-overlay.active { opacity: 1; pointer-events: auto; }
         .penalty-box { background: linear-gradient(180deg, #151821 0%, #0c0e14 100%); border: 2px solid var(--penalty-orange); border-bottom: none; padding: 35px; border-radius: 16px 16px 0 0; text-align: center; box-shadow: 0 -15px 40px rgba(255, 108, 0, 0.15); transform: translateY(100vh); transition: transform 0.2s cubic-bezier(0.1, 0.8, 0.3, 1); width: 100%; max-width: 480px; position: absolute; bottom: 0; }
@@ -310,7 +255,7 @@
     <div id="setup-screen" class="screen-overlay">
         <div class="menu-card">
             <h1>TRIGGER AGENT</h1>
-            <div class="lore-summary">Le Syndicat Rouge est retranché dans le complexe Kortex. Éliminez les cibles.</div>
+            <div class="lore-summary">Cibles en mouvement. Si un ennemi traverse sans être touché, il riposte. Ne manquez pas vos tirs.</div>
             
             <div class="stats-display">
                 <div>
@@ -357,7 +302,7 @@
             <h1>Rapport de Fin</h1>
             <div class="menu-label">Cibles Abattues</div>
             <div id="final-score" class="hud-value" style="font-size: 38px;">00</div>
-            <div id="credits-earned" style="color: #00e5ff; font-size: 12px; margin-bottom: 15px;">+0 $</div>
+            <div id="credits-earned" style="color: #00e5ff; font-size: 12px; margin-bottom: 15px;">+0 $ ajoutés en direct</div>
             <div class="menu-label" style="margin-bottom:15px;">Meilleure Série : <span id="final-streak" style="color:#fff;">0</span></div>
             
             <button id="second-chance-btn" class="primary-btn" style="border-color:#ff6c00; color:#ff6c00;">🎬 Gilet Pare-balles (Seconde Chance)</button>
@@ -367,8 +312,8 @@
 
     <div id="penalty-screen" class="penalty-overlay">
         <div class="penalty-box">
-            <div style="color:var(--penalty-orange); font-size:13px; font-weight:900; letter-spacing:3px;">RIAPOSTE ENNEMIE !</div>
-            <div style="color:rgba(255,255,255,0.4); font-size:10px; text-transform:uppercase;">Mise à couvert obligatoire...</div>
+            <div style="color:var(--penalty-orange); font-size:13px; font-weight:900; letter-spacing:3px;">RIPOSTES ENNEMIES !</div>
+            <div style="color:rgba(255,255,255,0.4); font-size:10px; text-transform:uppercase;">Cible manquée ou échappée...</div>
             <div id="penalty-timer" style="color:#fff; font-size:26px; font-weight:900; margin-top:5px;">5.0s</div>
             <div class="penalty-bar" id="penalty-bar"></div>
         </div>
@@ -382,7 +327,7 @@
             </div>
             <div id="streak-badge" class="multiplier-badge">X1</div>
             <div class="hud-panel" style="text-align: right;">
-                <span class="menu-label" style="margin:0; padding:0; display:block;">Primes Encaissées</span>
+                <span class="menu-label" style="margin:0; padding:0; display:block;">Score</span>
                 <div id="hud-score" class="hud-value">00000</div>
             </div>
         </div>
@@ -408,11 +353,11 @@
         let unlockedSkins = JSON.parse(localStorage.getItem('trigger_skins')) || ['cyan'];
         let currentSkin = localStorage.getItem('trigger_current_skin') || 'cyan';
 
-        let score = 0, streak = 0, maxStreak = 0, multiplier = 1;
+        let score = 0, streak = 0, maxStreak = 0, multiplier = 1, sessionEarned = 0;
         let gameMode = 'chrono', gameTimeAllocated = 60, timeLeft = 0, survivalLives = 3;
         let hasUsedSecondChance = false, isGameActive = false, isPenalized = false;
         let mouseX = 0, mouseY = 0;
-        let gameTimerInterval = null, penaltyInterval = null;
+        let gameTimerInterval = null, penaltyInterval = null, targetEscapeTimeout = null;
 
         const crosshair = document.getElementById('crosshair');
         const flash = document.getElementById('flash');
@@ -447,7 +392,6 @@
             });
         });
 
-        // Grille structurelle premium 6x7 (42 fenêtres)
         function createBuildingStructure() {
             buildingGrid.innerHTML = '';
             windowElements = [];
@@ -455,24 +399,16 @@
                 const win = document.createElement('div');
                 win.classList.add('window');
                 
-                // Texture interne
                 const blind = document.createElement('div');
                 blind.classList.add('window-blind');
                 win.appendChild(blind);
-
-                // Moins de fenêtres allumées et éclairage très tamisé
-                if (Math.random() < 0.12) win.classList.add('lit');
 
                 const tgt = document.createElement('div');
                 tgt.classList.add('target');
                 tgt.innerHTML = `
                     <div class="target-hat"></div>
-                    <div class="target-head">
-                        <div class="target-glasses"></div>
-                    </div>
-                    <div class="target-body">
-                        <div class="target-tie"></div>
-                    </div>
+                    <div class="target-head"><div class="target-glasses"></div></div>
+                    <div class="target-body"><div class="target-tie"></div></div>
                 `;
                 win.appendChild(tgt);
                 buildingGrid.appendChild(win);
@@ -534,8 +470,8 @@
         });
 
         function startGame() {
-            clearInterval(gameTimerInterval); clearInterval(penaltyInterval);
-            score = 0; streak = 0; maxStreak = 0; multiplier = 1;
+            clearInterval(gameTimerInterval); clearInterval(penaltyInterval); clearTimeout(targetEscapeTimeout);
+            score = 0; streak = 0; maxStreak = 0; multiplier = 1; sessionEarned = 0;
             hasUsedSecondChance = false; isPenalized = false; isGameActive = true;
             activeTargetNode = null;
             document.getElementById('second-chance-btn').style.display = 'block';
@@ -550,7 +486,7 @@
             }
             updateTimerText();
             setupScreen.classList.add('hidden');
-            document.querySelectorAll('.target').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.target').forEach(t => t.classList.remove('active', 'reverse'));
             moveTargetToRandomWindow();
         }
 
@@ -574,14 +510,37 @@
 
         function moveTargetToRandomWindow() {
             if (!isGameActive || isPenalized) return;
-            if (activeTargetNode) activeTargetNode.classList.remove('active');
+            
+            // Nettoie la cible précédente
+            if (activeTargetNode) {
+                activeTargetNode.classList.remove('active', 'reverse');
+            }
 
             const idx = Math.floor(Math.random() * windowElements.length);
             activeTargetNode = windowElements[idx].querySelector('.target');
 
             setTimeout(() => {
                 if (!isGameActive || isPenalized) return;
+                
+                // Choix aléatoire de la direction de la traversée
+                if (Math.random() > 0.5) {
+                    activeTargetNode.classList.add('reverse');
+                }
                 activeTargetNode.classList.add('active');
+
+                // Si la cible traverse pendant 1.8s (durée de l'animation CSS) sans être touchée :
+                clearTimeout(targetEscapeTimeout);
+                targetEscapeTimeout = setTimeout(() => {
+                    if (isGameActive && !isPenalized && activeTargetNode.classList.contains('active')) {
+                        streak = 0; multiplier = 1; updateHudDisplay();
+                        if (gameMode === 'survival') {
+                            survivalLives--; updateTimerText();
+                            if (survivalLives <= 0) { endGame(); return; }
+                        }
+                        triggerRipostePenalty(); // Pénalité d'échappée
+                    }
+                }, 1800);
+
             }, 50);
         }
 
@@ -601,9 +560,20 @@
             }
 
             if (hit) {
+                clearTimeout(targetEscapeTimeout); // On a touché, on annule l'échappée
                 streak++; if (streak > maxStreak) maxStreak = streak;
                 multiplier = streak >= 15 ? 4 : streak >= 10 ? 3 : streak >= 5 ? 2 : 1;
-                score += (100 * multiplier);
+                
+                const pointsEarned = (100 * multiplier);
+                score += pointsEarned;
+                
+                // ACTUALISATION IMMÉDIATE DES DOLLARS EN TEMPS RÉEL
+                const dollarsEarned = Math.floor(pointsEarned / 100);
+                userCredits += dollarsEarned;
+                sessionEarned += dollarsEarned;
+                localStorage.setItem('trigger_credits', userCredits);
+                updateHubCreditsDisplay(); // Met à jour l'affichage de l'agence discrètement
+
                 updateHudDisplay();
 
                 const rip = document.createElement('div');
@@ -612,12 +582,13 @@
 
                 moveTargetToRandomWindow();
             } else {
+                clearTimeout(targetEscapeTimeout);
                 streak = 0; multiplier = 1; updateHudDisplay();
                 if (gameMode === 'survival') {
                     survivalLives--; updateTimerText();
                     if (survivalLives <= 0) { endGame(); return; }
                 }
-                triggerRipostePenalty();
+                triggerRipostePenalty(); // Pénalité pour tir manqué
             }
         }
 
@@ -626,7 +597,8 @@
 
         function triggerRipostePenalty() {
             isPenalized = true;
-            if (activeTargetNode) activeTargetNode.classList.remove('active');
+            clearTimeout(targetEscapeTimeout);
+            if (activeTargetNode) activeTargetNode.classList.remove('active', 'reverse');
             crosshair.classList.add('disrupted');
             penaltyScreen.classList.add('active');
 
@@ -638,7 +610,13 @@
             clearInterval(penaltyInterval);
             penaltyInterval = setInterval(() => {
                 pTime -= 0.1;
-                if (pTime <= 0) { clearInterval(penaltyInterval); isPenalized = false; penaltyScreen.classList.remove('active'); crosshair.classList.remove('disrupted'); if (isGameActive) moveTargetToRandomWindow(); } 
+                if (pTime <= 0) { 
+                    clearInterval(penaltyInterval); 
+                    isPenalized = false; 
+                    penaltyScreen.classList.remove('active'); 
+                    crosshair.classList.remove('disrupted'); 
+                    if (isGameActive) moveTargetToRandomWindow(); 
+                } 
                 else { penaltyTimerText.textContent = `${Math.max(0, pTime).toFixed(1)}s`; }
             }, 100);
         }
@@ -652,17 +630,15 @@
         }
 
         function endGame() {
-            isGameActive = false; clearInterval(gameTimerInterval); clearInterval(penaltyInterval);
-            if (activeTargetNode) activeTargetNode.classList.remove('active');
+            isGameActive = false; clearInterval(gameTimerInterval); clearInterval(penaltyInterval); clearTimeout(targetEscapeTimeout);
+            if (activeTargetNode) activeTargetNode.classList.remove('active', 'reverse');
             penaltyScreen.classList.remove('active'); crosshair.classList.remove('disrupted');
 
-            const earned = Math.floor(score / 100); userCredits += earned;
-            localStorage.setItem('trigger_credits', userCredits);
             saveHighScore(score, gameMode);
 
             document.getElementById('final-score').textContent = String(score / 100);
             document.getElementById('final-streak').textContent = maxStreak;
-            document.getElementById('credits-earned').textContent = `+ ${earned} $ versés au portefeuille`;
+            document.getElementById('credits-earned').textContent = `+ ${sessionEarned} $ gagnés durant la session`;
             gameoverScreen.classList.remove('hidden');
         }
 
