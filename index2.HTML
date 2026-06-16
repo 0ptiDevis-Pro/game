@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRIGGER AGENT // Opération Fenêtre Ouverte</title>
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --accent-cyan: #00e5ff; /* Pointeur laser Agent */
+            --accent-glow: rgba(0, 229, 255, 0.4);
+            --target-red: #ff2353; /* Uniforme Syndicat */
+            --target-glow: rgba(255, 35, 83, 0.6);
+            --penalty-orange: #ff6c00;
+            --ui-bg: rgba(15, 20, 31, 0.94);
+            --border-style: 1px solid rgba(255, 255, 255, 0.08);
+            --building-color: #2a2e38; /* Couleur de l'immeuble */
+            --window-color: #1a1c22;  /* Couleur des fenêtres sombres */
+            --window-light: #fff8e1;   /* Couleur des fenêtres allumées (rare) */
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            cursor: none;
+        }
+
+        /* --- IMMENSILE ARRIÈRE-PLAN --- */
+        .bg-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* L'immeuble part du bas */
+        }
+
+        .building {
+            width: 80%; /* Largeur de l'immeuble */
+            height: 90vh; /* Hauteur de l'immeuble */
+            background-color: var(--building-color);
+            border-radius: 10px 10px 0 0;
+            padding: 40px; /* Espace pour les fenêtres */
+            display: grid;
+            grid-template-columns: repeat(10, 1fr); /* 10 colonnes de fenêtres */
+            grid-template-rows: repeat(15, 1fr);    /* 15 rangées de fenêtres */
+            gap: 15px; /* Espace entre les fenêtres */
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .window {
+            background-color: var(--window-color);
+            border-radius: 4px;
+            position: relative; /* Pour positionner la cible à l'intérieur */
+            transition: background-color 0.3s;
+        }
+
+        .window.lit {
+            background-color: var(--window-light);
+            box-shadow: 0 0 10px var(--window-light);
+        }
+
+        /* --- ÉCRANS MENUS (STYLE CASUAL / ACTION) --- */
+        .screen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(8, 11, 18, 0.98);
+            backdrop-filter: blur(25px);
+            z-index: 500;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            cursor: default;
+        }
+
+        .screen-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.03);
+        }
+
+        .menu-card {
+            background: var(--ui-bg);
+            border: var(--border-style);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 40px 90px rgba(0,0,0,0.85);
+            text-align: center;
+            max-width: 480px;
+            width: 95%;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .menu-card h1 {
+            color: #fff;
+            font-size: 32px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lore-summary {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.6;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .menu-label {
+            color: rgba(255,255,255,0.3);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            margin-top: 15px;
+        }
+
+        /* Boutons de sélection */
+        .selector-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.7);
+            padding: 14px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .toggle-btn:hover, .toggle-btn.active {
+            background: var(--accent-cyan);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-glow);
+            border-color: var(--accent-cyan);
+            font-weight: 800;
+        }
+
+        .primary-btn {
+            width: 100%;
+            background: transparent;
+            border: 2px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .primary-btn:hover {
+            background: var(--accent-cyan);
+            color: #000;
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #999;
+            width: 100%;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s ease;
+        }
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        /* --- ARSENAL / BOUTIQUE DE LASERS --- */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .shop-item {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .shop-item:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .shop-item.equipped {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 229, 255, 0.05);
+        }
+
+        .skin-preview {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin: 0 auto 10px auto;
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .skin-name {
+            font-size: 12px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .skin-cost {
+            font-size: 11px;
+            color: var(--accent-cyan);
+            margin-top: 5px;
+            font-weight: 700;
+        }
+
+        /* --- STATS ET BANQUE --- */
+        .stats-display {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0,0,0,0.4);
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .leaderboard-list {
+            text-align: left;
+            background: rgba(0,0,0,0.3);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #ccc;
+        }
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .leaderboard-item:last-child { border: none; }
+
+        /* --- HUD SÉCURISÉ --- */
+        .hud-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 25px;
+        }
+
+        .hud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hud-panel {
+            background: var(--ui-bg);
+            border: var(--border-style);
+            backdrop-filter: blur(12px);
+            padding: 12px 25px;
+            border-radius: 12px;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            min-width: 180px;
+        }
+
+        .hud-value {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 15px var(--accent-glow);
+            margin-top: 2px;
+        }
+
+        .streak-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 200px;
+        }
+
+        .multiplier-badge {
+            font-size: 16px;
+            font-weight: 900;
+            color: #fff;
+            background: linear-gradient(135deg, var(--target-red), var(--penalty-orange));
+            padding: 6px 18px;
+            border-radius: 8px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .multiplier-badge.active {
+            opacity: 1;
+            transform: scale(1);
+            box-shadow: 0 0 25px rgba(255, 35, 83, 0.4);
+        }
+
+        /* --- CONTEXTE DE PÉNALITÉ : À COUVERT / ENEMY RETALIATION --- */
+        .penalty-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 40, 0, 0.08); 
+            z-index: 400; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none; 
+            transition: opacity 0.15s ease;
+        }
+
+        .penalty-overlay.active {
+            opacity: 1;
+            pointer-events: auto; 
+            cursor: none;
+        }
+
+        /* Mur en béton de protection tactique */
+        .penalty-box {
+            background: linear-gradient(180deg, #1e222b 0%, #13151b 100%);
+            border: 2px solid var(--penalty-orange);
+            border-bottom: none;
+            padding: 40px 60px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            box-shadow: 0 -20px 50px rgba(255, 108, 0, 0.2);
+            transform: translateY(100vh); /* Surgit du bas comme une couverture */
+            transition: transform 0.2s cubic-bezier(0.1, 0.8, 0.3, 1);
+            width: 100%;
+            max-width: 600px;
+            position: absolute;
+            bottom: 0;
+        }
+
+        .penalty-overlay.active .penalty-box {
+            transform: translateY(0);
+        }
+
+        .penalty-title {
+            color: var(--penalty-orange);
+            font-size: 14px;
+            letter-spacing: 5px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .penalty-sub {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .penalty-timer {
+            color: #fff;
+            font-size: 36px;
+            font-weight: 900;
+        }
+
+        .penalty-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 108, 0, 0.15);
+            margin-top: 20px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .penalty-bar {
+            height: 100%;
+            width: 100%;
+            background: var(--penalty-orange);
+            transform-origin: left;
+            transform: scaleX(1);
+        }
+
+        /* --- DESIGN STYLE "JOHNNY TRIGGER" DES ENNEMIS DANS LES FENÊTRES --- */
+        .game-space {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none; /* Laisse passer les clics vers l'immeuble si besoin */
+        }
+
+        /* La cible (mafieux) se positionne ABSOLUMENT par rapport à sa fenêtre parente */
+        .target {
+            position: absolute;
+            width: 80%; /* S'adapte à la taille de la fenêtre */
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            background: #151722; /* Teinte mafieuse */
+            border: 2px solid var(--target-red);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--target-glow);
+            transform: scale(0); /* Caché par défaut */
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: auto; /* Redevient cliquable */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10; /* Devant la fenêtre allumée */
+        }
+
+        .target.active {
+            transform: scale(1);
+        }
+
+        /* Chapeau Fedora du parrain (S'adapte) */
+        .target-hat {
+            width: 80%;
+            height: 15%;
+            background: var(--target-red);
+            border-radius: 3px;
+            box-shadow: 0 0 8px var(--target-red);
+            position: absolute;
+            top: 15%;
+        }
+
+        /* Lunettes de soleil blanches lumineuses (Style Vector minimaliste, S'adapte) */
+        .target-glasses {
+            display: flex;
+            gap: 2px;
+            position: absolute;
+            top: 45%;
+            width: 60%;
+            justify-content: center;
+        }
+
+        .target-glasses::before, .target-glasses::after {
+            content: '';
+            width: 40%;
+            height: 100%;
+            background: #ffffff;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 0 10px #ffffff;
+        }
+
+        /* --- VISEUR LASER --- */
+        .crosshair {
+            position: fixed;
+            width: 50px;
+            height: 50px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 600; 
+            mix-blend-mode: difference;
+        }
+
+        .crosshair.disrupted .circle,
+        .crosshair.disrupted .dot,
+        .crosshair.disrupted .line {
+            border-color: var(--penalty-orange) !important;
+            background: var(--penalty-orange) !important;
+            opacity: 0.4;
+        }
+
+        .crosshair .circle {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 34px;
+            height: 34px;
+            border: 1.5px solid var(--accent-cyan);
+            border-radius: 50%;
+        }
+
+        .crosshair .dot {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            width: 2px;
+            height: 2px;
+            background: var(--accent-cyan);
+        }
+
+        .crosshair .line { position: absolute; background: var(--accent-cyan); }
+        .crosshair .line.v { width: 1.5px; height: 8px; left: 24.25px; }
+        .crosshair .line.h { width: 8px; height: 1.5px; top: 24.25px; }
+        .crosshair .line.top { top: 0; }
+        .crosshair .line.bottom { bottom: 0; }
+        .crosshair .line.left { left: 0; }
+        .crosshair .line.right { right: 0; }
+
+        .flash {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.06);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .flash.fire { animation: weapon-flash 0.1s ease-out; }
+        @keyframes weapon-flash { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+        .hit-ripple {
+            position: absolute;
+            border: 2px solid var(--accent-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%) scale(0);
+            animation: rip 0.35s ease-out forwards;
+        }
+        @keyframes rip { to { width: 90px; height: 90px; transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+
+        .footer-text {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.12);
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid">
+        <div class="building" id="building-grid">
+            </div>
+    </div>
+
+    <div id="flash" class="flash"></div>
+
+    <div id="setup-screen" class="screen-overlay">
+        <div class="menu-card">
+            <h1>TRIGGER AGENT</h1>
+            <div class="lore-summary">
+                Le Syndicat Rouge a pris position dans l'immeuble Kortex. Neutralisez les assassins postés aux fenêtres. Attention : chaque tir manqué déclenche leur riposte et vous oblige à vous mettre à couvert !
+            </div>
+            
+            <div class="stats-display">
+                <div>
+                    <div style="font-size:9px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing: 1px;">Primes encaissées</div>
+                    <div id="hub-credits" style="color:#00e5ff; font-weight:900; font-size:20px;">0 $</div>
+                </div>
+            </div>
+
+            <div class="menu-label">Type de contrat</div>
+            <div class="selector-row">
+                <button class="toggle-btn active" id="mode-chrono-btn">Nettoyage Chronométré</button>
+                <button class="toggle-btn" id="mode-survival-btn">Assaut Tactique (3 Vies)</button>
+            </div>
+
+            <div id="time-selector-wrapper">
+                <div class="menu-label">Fenêtre d'intervention</div>
+                <div class="selector-row">
+                    <button class="time-btn toggle-btn active" data-time="60">60 Sec</button>
+                    <button class="time-btn toggle-btn" data-time="120">120 Sec</button>
+                    <button class="time-btn toggle-btn" data-time="180">180 Sec</button>
+                </div>
+            </div>
+
+            <div class="menu-label">Meilleurs Contrats Archivés</div>
+            <div id="leaderboard" class="leaderboard-list"></div>
+
+            <button id="start-btn" class="primary-btn">Accepter le contrat</button>
+            <button id="open-shop-btn" class="secondary-btn">Acheter des Viseurs Lasers (Boutique)</button>
+        </div>
+    </div>
+
+    <div id="shop-screen" class="screen-overlay hidden">
+        <div class="menu-card">
+            <h1>Armurerie de l'Agence</h1>
+            <div class="stats-display">
+                <div>
+                    <div style="font-size:10px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Budget disponible</div>
+                    <div id="shop-credits" style="color:#00e5ff; font-weight:900; font-size:18px;">0 $</div>
+                </div>
+            </div>
+
+            <div class="shop-grid" id="shop-items-container"></div>
+
+            <button id="close-shop-btn" class="primary-btn">Quitter l'armurerie</button>
+        </div>
+    </div>
+
+    <div id="gameover-screen" class="screen-overlay hidden">
+        <div class="menu-card">
+            <h1>Rapport de Mission</h1>
+            
+            <div class="menu-label">Cibles éliminées</div>
+            <div id="final-score" class="hud-value" style="font-size: 42px; margin-bottom: 5px;">00</div>
+            <div id="credits-earned" style="color: #00e5ff; font-size: 13px; font-weight: 700; margin-bottom: 20px;">+0 $ de prime</div>
+            
+            <div class="menu-label">Combo maximal : <span id="final-streak" style="color: #fff; font-weight: bold;">0</span></div>
+            
+            <button id="second-chance-btn" class="primary-btn" style="border-color: #ff6c00; color: #ff6c00;">
+                🎬 Utiliser un gilet pare-balles (+30s / +1 Vie)
+            </button>
+            
+            <button id="restart-btn" class="secondary-btn" style="margin-top: 15px; padding: 15px;">Mettre à jour le dossier</button>
+        </div>
+    </div>
+
+    <div id="penalty-screen" class="penalty-overlay">
+        <div class="penalty-box">
+            <div class="penalty-title">À Couvert !</div>
+            <div class="penalty-sub">Le syndicat riposte ! Restez caché...</div>
+            <div id="penalty-timer" class="penalty-timer">5.0s</div>
+            <div class="penalty-progress">
+                <div id="penalty-bar" class="penalty-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hud-layer">
+        <div class="hud-header">
+            <div class="hud-panel">
+                <span id="hud-label-left" class="menu-label" style="margin:0;">Chrono Mission</span>
+                <div id="hud-timer" class="hud-value">00:00</div>
+            </div>
+            <div class="streak-container">
+                <div id="streak-badge" class="multiplier-badge">X1</div>
+            </div>
+            <div class="hud-panel" style="text-align: right;">
+                <span class="menu-label" style="margin:0;">Contrats Remplis</span>
+                <div id="hud-score" class="hud-value">00000</div>
+            </div>
+        </div>
+        <div class="footer-text">Clic gauche / Entrée pour presser la détente</div>
+    </div>
+
+    <div id="crosshair" class="crosshair">
+        <div class="circle"></div>
+        <div class="dot"></div>
+        <div class="line v top"></div>
+        <div class="line v bottom"></div>
+        <div class="line h left"></div>
+        <div class="line h right"></div>
+    </div>
+
+    <script>
+        const SKINS_DATA = [
+            { id: 'cyan', name: 'Laser Cyan (Base)', color: '#00e5ff', cost: 0 },
+            { id: 'gold', name: 'Laser Or Élite', color: '#ffb700', cost: 250 },
+            { id: 'pink', name: 'Spectre Fuchsia', color: '#ff007f', cost: 500 },
+            { id: 'acid', name: 'Viper Toxique', color: '#00ff22', cost: 750 }
+        ];
+
+        // Stockage local
+        let userCredits = parseInt(localStorage.getItem('trigger_credits')) || 0;
+        let highScores = JSON.parse(localStorage.getItem('trigger_highscores')) || [];
+        let unlockedSkins = JSON.parse(localStorage.getItem('trigger_skins')) || ['cyan'];
+        let currentSkin = localStorage.getItem('trigger_current_skin') || 'cyan';
+
+        // Variables de session
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let multiplier = 1;
+        let gameMode = 'chrono'; 
+        let gameTimeAllocated = 60; 
+        let timeLeft = 0;
+        let survivalLives = 3;
+        let hasUsedSecondChance = false;
+        
+        let gameTimerInterval = null;
+        let penaltyInterval = null;
+        
+        let isGameActive = false;
+        let isPenalized = false;
+        
+        let mouseX = 0;
+        let mouseY = 0;
+
+        // Éléments DOM
+        const crosshair = document.getElementById('crosshair');
+        const flash = document.getElementById('flash');
+        const buildingGrid = document.getElementById('building-grid');
+        
+        const setupScreen = document.getElementById('setup-screen');
+        const gameoverScreen = document.getElementById('gameover-screen');
+        const shopScreen = document.getElementById('shop-screen');
+        const penaltyScreen = document.getElementById('penalty-screen');
+        const penaltyTimerText = document.getElementById('penalty-timer');
+        const penaltyBar = document.getElementById('penalty-bar');
+
+        const hudScore = document.getElementById('hud-score');
+        const hudTimer = document.getElementById('hud-timer');
+        const hudLabelLeft = document.getElementById('hud-label-left');
+        const streakBadge = document.getElementById('streak-badge');
+        const finalScoreText = document.getElementById('final-score');
+        const finalStreakText = document.getElementById('final-streak');
+        const creditsEarnedText = document.getElementById('credits-earned');
+        const secondChanceBtn = document.getElementById('second-chance-btn');
+
+        // Références aux fenêtres et à la cible active
+        let windows = [];
+        let activeTarget = null; // Élément .target actuellement affiché
+
+        // Initialisation de l'application
+        window.addEventListener('DOMContentLoaded', () => {
+            generateBuildingWindows();
+            applySkinProperties(currentSkin);
+            renderLeaderboard();
+            updateHubCreditsDisplay();
+            buildShopUI();
+        });
+
+        // Suivi fluide du viseur
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            requestAnimationFrame(() => {
+                crosshair.style.left = `${mouseX}px`;
+                crosshair.style.top = `${mouseY}px`;
+            });
+        });
+
+        /* --- GÉNÉRATION DYNAMIQUE DE L'IMMEUBLE --- */
+        function generateBuildingWindows() {
+            buildingGrid.innerHTML = ''; // Nettoyer
+            windows = [];
+
+            // 15 rangées x 10 colonnes = 150 fenêtres
+            for (let i = 0; i < 150; i++) {
+                const win = document.createElement('div');
+                win.classList.add('window');
+                
+                // Parfois, une fenêtre est allumée pour le réalisme (5% de chance)
+                if (Math.random() < 0.05) {
+                    win.classList.add('lit');
+                }
+
+                // Insérer la cible (Johnny Trigger) cachée dans CHAQUE fenêtre
+                const targetEl = document.createElement('div');
+                targetEl.classList.add('target');
+                targetEl.innerHTML = `
+                    <div class="target-hat"></div>
+                    <div class="target-glasses"></div>
+                `;
+                win.appendChild(targetEl);
+
+                buildingGrid.appendChild(win);
+                windows.push(win);
+            }
+        }
+
+        /* --- LOGIQUE INTERFACE MENUS ET CONFIGURATIONS --- */
+        document.getElementById('mode-chrono-btn').addEventListener('click', () => {
+            gameMode = 'chrono';
+            document.getElementById('mode-chrono-btn').classList.add('active');
+            document.getElementById('mode-survival-btn').classList.remove('active');
+            document.getElementById('time-selector-wrapper').style.display = 'block';
+        });
+
+        document.getElementById('mode-survival-btn').addEventListener('click', () => {
+            gameMode = 'survival';
+            document.getElementById('mode-survival-btn').classList.add('active');
+            document.getElementById('mode-chrono-btn').classList.remove('active');
+            document.getElementById('time-selector-wrapper').style.display = 'none';
+        });
+
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                gameTimeAllocated = parseInt(btn.getAttribute('data-time'));
+            });
+        });
+
+        document.getElementById('start-btn').addEventListener('click', () => startGame());
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            gameoverScreen.classList.add('hidden');
+            setupScreen.classList.remove('hidden');
+            renderLeaderboard();
+        });
+
+        // Navigation boutique
+        document.getElementById('open-shop-btn').addEventListener('click', () => {
+            setupScreen.classList.add('hidden');
+            shopScreen.classList.remove('hidden');
+            buildShopUI();
+        });
+        document.getElementById('close-shop-btn').addEventListener('click', () => {
+            shopScreen.classList.add('hidden');
+            setupScreen.classList.remove('hidden');
+            updateHubCreditsDisplay();
+        });
+
+        // Seconde chance (Gilet pare-balles)
+        secondChanceBtn.addEventListener('click', () => {
+            if (hasUsedSecondChance) return;
+            hasUsedSecondChance = true;
+            secondChanceBtn.style.display = 'none'; 
+            isGameActive = true;
+            gameoverScreen.classList.add('hidden');
+            
+            if (gameMode === 'chrono') {
+                timeLeft = 30; 
+                updateTimerText();
+                launchChronoLoop();
+            } else {
+                survivalLives = 1; 
+                updateTimerText();
+            }
+            
+            isPenalized = false;
+            penaltyScreen.classList.remove('active');
+            crosshair.classList.remove('disrupted');
+            moveTarget();
+        });
+
+        /* --- MOTEUR DE JEU --- */
+        function startGame() {
+            clearInterval(gameTimerInterval);
+            clearInterval(penaltyInterval);
+            
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            multiplier = 1;
+            hasUsedSecondChance = false;
+            isPenalized = false;
+            isGameActive = true;
+            activeTarget = null;
+
+            secondChanceBtn.style.display = 'block'; 
+            updateHudDisplay();
+            
+            if (gameMode === 'chrono') {
+                hudLabelLeft.textContent = "Chrono Mission";
+                timeLeft = gameTimeAllocated;
+                updateTimerText();
+                launchChronoLoop();
+            } else {
+                hudLabelLeft.textContent = "Santé Agent";
+                survivalLives = 3;
+                updateTimerText();
+            }
+            
+            setupScreen.classList.add('hidden');
+            penaltyScreen.classList.remove('active');
+            crosshair.classList.remove('disrupted');
+
+            // Cacher toutes les cibles potentiellement actives
+            document.querySelectorAll('.target').forEach(t => t.classList.remove('active'));
+            moveTarget();
+        }
+
+        // Le chrono défile, même pendant la pénalité
+        function launchChronoLoop() {
+            gameTimerInterval = setInterval(() => {
+                if (isGameActive) { 
+                    timeLeft--;
+                    updateTimerText();
+                    if (timeLeft <= 0) {
+                        endGame();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerText() {
+            if (gameMode === 'chrono') {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                hudTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            } else {
+                hudTimer.textContent = "❤️ ".repeat(survivalLives) || "K.O.";
+            }
+        }
+
+        /* CORRECTION MAJEURE : Faire apparaître la cible DANS une fenêtre aléatoire */
+        function moveTarget() {
+            if (!isGameActive || isPenalized) return;
+            
+            // Cacher l'ancienne cible si elle existe
+            if (activeTarget) {
+                activeTarget.classList.remove('active');
+            }
+
+            // Choisir une fenêtre au hasard parmi les 150
+            const randomIndex = Math.floor(Math.random() * windows.length);
+            const targetWindow = windows[randomIndex];
+            
+            // Récupérer l'élément .target caché à l'intérieur
+            activeTarget = targetWindow.querySelector('.target');
+
+            // Petit délai pour l'animation d'apparition "premium"
+            setTimeout(() => {
+                if (!isGameActive || isPenalized) return;
+                activeTarget.classList.add('active');
+            }, 60);
+        }
+
+        /* --- SYSTÈME RECONNAISSANCE DES INPUTS --- */
+        function processShot(e, isKeyboard = false) {
+            if (!isGameActive || isPenalized) return;
+            if (e && e.target.closest('.screen-overlay')) return; 
+
+            flash.classList.remove('fire');
+            void flash.offsetWidth; 
+            flash.classList.add('fire');
+
+            let hitTarget = false;
+            let posX = mouseX;
+            let posY = mouseY;
+
+            // Vérifier si le tir (clic ou entrée) touche la CIBLE ACTIVE
+            if (isKeyboard) {
+                const elementAtCursor = document.elementFromPoint(mouseX, mouseY);
+                // Si l'élément sous le curseur est la cible ou contenu dans la cible
+                if (elementAtCursor === activeTarget || activeTarget.contains(elementAtCursor)) hitTarget = true;
+            } else {
+                // e.target est l'élément qui a reçu le clic
+                if (e.target === activeTarget || activeTarget.contains(e.target)) hitTarget = true;
+                posX = e.clientX;
+                posY = e.clientY;
+            }
+
+            if (hitTarget) {
+                handleHit(posX, posY);
+            } else {
+                handleMiss();
+            }
+        }
+
+        // Clic global intercepté
+        window.addEventListener('mousedown', (e) => {
+            if (isGameActive && !isPenalized) {
+                e.stopPropagation();
+                processShot(e, false);
+            }
+        });
+
+        // Touche Entrée interceptée
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && isGameActive && !isPenalized) {
+                processShot(null, true);
+            }
+        });
+
+        /* --- LOGIQUE DE JEU : IMPACT / ÉCHEC --- */
+        function handleHit(x, y) {
+            streak++;
+            if (streak > maxStreak) maxStreak = streak;
+
+            // Paliers de combo
+            if (streak >= 15) multiplier = 4;
+            else if (streak >= 10) multiplier = 3;
+            else if (streak >= 5) multiplier = 2;
+            else multiplier = 1;
+
+            score += (100 * multiplier);
+            updateHudDisplay();
+
+            // Ripple effect d'impact laser
+            const ripple = document.createElement('div');
+            ripple.classList.add('hit-ripple');
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 350);
+
+            moveTarget();
+        }
+
+        function handleMiss() {
+            streak = 0;
+            multiplier = 1;
+            updateHudDisplay();
+
+            if (gameMode === 'survival') {
+                survivalLives--;
+                updateTimerText();
+                if (survivalLives <= 0) {
+                    endGame();
+                    return;
+                }
+            }
+            triggerPenaltyBlock();
+        }
+
+        /* --- PÉNALITÉ SCÉNARISÉE : À COUVERT (5s) --- */
+        function triggerPenaltyBlock() {
+            isPenalized = true;
+            
+            // Cacher la cible active pendant la riposte
+            if (activeTarget) {
+                activeTarget.classList.remove('active');
+            }
+            
+            crosshair.classList.add('disrupted');
+            penaltyScreen.classList.add('active'); // Bloque physiquement les clics
+
+            let penaltyTimeLeft = 5.0;
+            penaltyTimerText.textContent = `${penaltyTimeLeft.toFixed(1)}s`;
+            
+            penaltyBar.style.transition = 'none';
+            penaltyBar.style.transform = 'scaleX(1)';
+            void penaltyBar.offsetWidth; // Force le reflow
+            penaltyBar.style.transition = 'transform 5000ms linear';
+            penaltyBar.style.transform = 'scaleX(0)';
+
+            clearInterval(penaltyInterval);
+            penaltyInterval = setInterval(() => {
+                penaltyTimeLeft -= 0.1;
+                if (penaltyTimeLeft <= 0) {
+                    clearInterval(penaltyInterval);
+                    endPenaltyBlock();
+                } else {
+                    penaltyTimerText.textContent = `${Math.max(0, penaltyTimeLeft).toFixed(1)}s`;
+                }
+            }, 100);
+        }
+
+        function endPenaltyBlock() {
+            isPenalized = false;
+            penaltyScreen.classList.remove('active'); 
+            crosshair.classList.remove('disrupted');
+            if (isGameActive) {
+                // Rallumer une cible quand on sort de couverture
+                moveTarget();
+            }
+        }
+
+        function updateHudDisplay() {
+            hudScore.textContent = String(score).padStart(5, '0');
+            if (multiplier > 1) {
+                streakBadge.textContent = `COMBO X${multiplier} (${streak})`;
+                streakBadge.className = 'multiplier-badge active';
+            } else {
+                streakBadge.className = 'multiplier-badge';
+            }
+        }
+
+        /* --- SAUVEGARDES, HIGH SCORES ET MONNAIE --- */
+        function endGame() {
+            isGameActive = false;
+            clearInterval(gameTimerInterval);
+            clearInterval(penaltyInterval);
+            
+            // Cacher la cible
+            if (activeTarget) {
+                activeTarget.classList.remove('active');
+            }
+            
+            penaltyScreen.classList.remove('active');
+            crosshair.classList.remove('disrupted');
+            
+            // Gain d'argent (Primes) : 100 pts score = 1$
+            const earnedCredits = Math.floor(score / 100);
+            userCredits += earnedCredits;
+            localStorage.setItem('trigger_credits', userCredits);
+
+            saveHighScore(score, gameMode);
+
+            // Affichage UI finale
+            finalScoreText.textContent = String(score / 100); // Nombre de cibles
+            finalStreakText.textContent = maxStreak;
+            creditsEarnedText.textContent = `+ ${earnedCredits} $ transférés sur votre compte`;
+            
+            gameoverScreen.classList.remove('hidden');
+        }
+
+        function saveHighScore(finalScore, mode) {
+            const modeLabel = mode === 'chrono' ? 'Nettoyage' : 'Assaut';
+            highScores.push({ score: finalScore, mode: modeLabel, date: new Date().toLocaleDateString('fr-FR') });
+            highScores.sort((a, b) => b.score - a.score);
+            highScores = highScores.slice(0, 3);
+            localStorage.setItem('trigger_highscores', JSON.stringify(highScores));
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboard');
+            if (highScores.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:rgba(255,255,255,0.15); font-size:11px;">Aucun dossier criminel résolu</div>`;
+                return;
+            }
+            container.innerHTML = highScores.map((row, idx) => `
+                <div class="leaderboard-item">
+                    <span>#${idx+1} [Opération-${row.mode}] - ${row.date}</span>
+                    <span style="color:#00e5ff; font-weight:bold;">${String(row.score / 100)} éliminations</span>
+                </div>
+            `).join('');
+        }
+
+        function updateHubCreditsDisplay() {
+            document.getElementById('hub-credits').textContent = `${userCredits} $`;
+            document.getElementById('shop-credits').textContent = `${userCredits} $`;
+        }
+
+        /* --- ENGINE DE CUSTOMISATION (BOUTIQUE DE SKINS) --- */
+        function buildShopUI() {
+            const container = document.getElementById('shop-items-container');
+            container.innerHTML = SKINS_DATA.map(skin => {
+                const isUnlocked = unlockedSkins.includes(skin.id);
+                const isEquipped = currentSkin === skin.id;
+                
+                let actionText = `<span class="skin-cost">${skin.cost} $</span>`;
+                if (isUnlocked) {
+                    actionText = isEquipped ? `<span style="color:#00e5ff; font-size:11px;">OPÉRATIONNEL</span>` : `<span style="color:rgba(255,255,255,0.3); font-size:11px;">DISPONIBLE</span>`;
+                }
+
+                return `
+                    <div class="shop-item ${isEquipped ? 'equipped' : ''}" onclick="selectSkinItem('${skin.id}')">
+                        <div class="skin-preview" style="background:${skin.color}; color:${skin.color};"></div>
+                        <div class="skin-name">${skin.name}</div>
+                        ${actionText}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.selectSkinItem = function(id) {
+            const skin = SKINS_DATA.find(s => s.id === id);
+            const isUnlocked = unlockedSkins.includes(id);
+
+            if (isUnlocked) {
+                // Équiper
+                currentSkin = id;
+                localStorage.setItem('trigger_current_skin', id);
+                applySkinProperties(id);
+            } else {
+                // Acheter
+                if (userCredits >= skin.cost) {
+                    userCredits -= skin.cost;
+                    unlockedSkins.push(id);
+                    currentSkin = id;
+                    
+                    localStorage.setItem('trigger_credits', userCredits);
+                    localStorage.setItem('trigger_skins', JSON.stringify(unlockedSkins));
+                    localStorage.setItem('trigger_current_skin', id);
+                    
+                    applySkinProperties(id);
+                    updateHubCreditsDisplay();
+                } else {
+                    alert("Fonds insuffisants pour acquérir cette fréquence laser.");
+                }
+            }
+            buildShopUI();
+        };
+
+        function applySkinProperties(id) {
+            const skin = SKINS_DATA.find(s => s.id === id) || SKINS_DATA[0];
+            document.documentElement.style.setProperty('--accent-cyan', skin.color);
+            // Recalcul de la lueur dynamique
+            const rgb = hexToRgb(skin.color);
+            document.documentElement.style.setProperty('--accent-glow', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`);
+        }
+
+        function hexToRgb(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 0, g: 229, b: 255 };
+        }
+    </script>
+</body>
+</html>
