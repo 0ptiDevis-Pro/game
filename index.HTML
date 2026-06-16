@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.N.I.P.E.R. - Tactical Aim Trainer</title>
+    <title>S.N.I.P.E.R. - Tactical Aim Trainer Pro</title>
     <style>
         :root {
             --bg-color: #05080c;
-            --accent-cyan: #00ffcc;
+            --accent-cyan: #00ffcc; /* Dynamique selon le skin */
             --accent-glow: rgba(0, 255, 204, 0.3);
             --target-red: #ff3366;
             --target-glow: rgba(255, 51, 102, 0.5);
@@ -29,7 +29,7 @@
             overflow: hidden;
             background-color: var(--bg-color);
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            cursor: none; /* Masque le curseur système */
+            cursor: none;
         }
 
         /* Grille tactique */
@@ -44,15 +44,15 @@
             z-index: 1;
         }
 
-        /* --- ÉCRANS MENUS (LOBBY / GAME OVER) --- */
+        /* --- ÉCRANS MENUS (LOBBY / GAME OVER / BOUTIQUE) --- */
         .screen-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(4, 6, 10, 0.95);
-            backdrop-filter: blur(15px);
+            background: rgba(4, 6, 10, 0.96);
+            backdrop-filter: blur(20px);
             z-index: 500;
             display: flex;
             justify-content: center;
@@ -70,20 +70,22 @@
         .menu-card {
             background: var(--ui-bg);
             border: var(--border-style);
-            padding: 40px;
+            padding: 35px;
             border-radius: 16px;
             box-shadow: 0 30px 60px rgba(0,0,0,0.8);
             text-align: center;
-            max-width: 450px;
-            width: 90%;
+            max-width: 500px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .menu-card h1 {
             color: #fff;
-            font-size: 24px;
+            font-size: 26px;
             letter-spacing: 6px;
             text-transform: uppercase;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             font-weight: 900;
             background: linear-gradient(45deg, #fff, var(--accent-cyan));
             -webkit-background-clip: text;
@@ -95,29 +97,33 @@
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            margin-top: 15px;
         }
 
-        .time-selector {
+        /* Selecteurs de Modes & Temps */
+        .selector-row {
             display: flex;
             justify-content: space-between;
             gap: 10px;
-            margin-bottom: 35px;
+            margin-bottom: 15px;
         }
 
-        .time-btn {
+        .toggle-btn {
             flex: 1;
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.1);
             color: #fff;
-            padding: 12px 0;
+            padding: 12px 6px;
             border-radius: 8px;
             font-weight: 700;
+            font-size: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
+            text-transform: uppercase;
         }
 
-        .time-btn:hover, .time-btn.active {
+        .toggle-btn:hover, .toggle-btn.active {
             background: var(--accent-cyan);
             color: var(--bg-color);
             box-shadow: 0 0 15px var(--accent-glow);
@@ -131,12 +137,13 @@
             color: var(--accent-cyan);
             padding: 15px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 3px;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin-top: 15px;
         }
 
         .primary-btn:hover {
@@ -144,6 +151,102 @@
             color: var(--bg-color);
             box-shadow: 0 0 25px var(--accent-glow);
         }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ccc;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s ease;
+        }
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        /* --- SYSTÈME DE BOUTIQUE (SKINS) --- */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .shop-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .shop-item:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .shop-item.equipped {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 255, 204, 0.05);
+        }
+
+        .skin-preview {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin: 0 auto 8px auto;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .skin-name {
+            font-size: 12px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .skin-cost {
+            font-size: 11px;
+            color: #00ffcc;
+            margin-top: 4px;
+            font-weight: 700;
+        }
+
+        /* --- STATS & LEADERBOARD LOCAL --- */
+        .stats-display {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .leaderboard-list {
+            text-align: left;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #ddd;
+        }
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .leaderboard-item:last-child { border: none; }
 
         /* --- INTERFACE DE JEU (HUD) --- */
         .hud-layer {
@@ -214,7 +317,7 @@
             box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);
         }
 
-        /* --- BLOQUEUR DE PÉNALITÉ (SURCHAUFFE) --- */
+        /* --- INTERCEPTEUR DE PÉNALITÉ (SURCHAUFFE) --- */
         .penalty-overlay {
             position: fixed;
             top: 0;
@@ -393,24 +496,70 @@
     <div id="setup-screen" class="screen-overlay">
         <div class="menu-card">
             <h1>S.N.I.P.E.R. Suite</h1>
-            <div class="menu-label">Durée de la simulation</div>
-            <div class="time-selector">
-                <button class="time-btn active" data-time="60">1 Min</button>
-                <button class="time-btn" data-time="120">2 Min</button>
-                <button class="time-btn" data-time="180">3 Min</button>
-                <button class="time-btn" data-time="300">5 Min</button>
+            
+            <div class="stats-display">
+                <div>
+                    <div style="font-size:10px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Nanocrédits</div>
+                    <div id="hub-credits" style="color:#00ffcc; font-weight:800; font-size:18px;">0</div>
+                </div>
             </div>
+
+            <div class="menu-label">Mode d'entraînement</div>
+            <div class="selector-row">
+                <button class="toggle-btn active" id="mode-chrono-btn">Chronometré</button>
+                <button class="toggle-btn" id="mode-survival-btn">Survie (3 Vies)</button>
+            </div>
+
+            <div id="time-selector-wrapper">
+                <div class="menu-label">Durée de la simulation</div>
+                <div class="selector-row">
+                    <button class="time-btn toggle-btn active" data-time="60">1 Min</button>
+                    <button class="time-btn toggle-btn" data-time="120">2 Min</button>
+                    <button class="time-btn toggle-btn" data-time="180">3 Min</button>
+                </div>
+            </div>
+
+            <div class="menu-label">Meilleurs Scores Locaux</div>
+            <div id="leaderboard" class="leaderboard-list">
+                </div>
+
             <button id="start-btn" class="primary-btn">Lancer l'exercice</button>
+            <button id="open-shop-btn" class="secondary-btn">Ouvrir la Boutique de Viseurs</button>
+        </div>
+    </div>
+
+    <div id="shop-screen" class="screen-overlay hidden">
+        <div class="menu-card">
+            <h1>Armurerie Tactique</h1>
+            <div class="stats-display">
+                <div>
+                    <div style="font-size:10px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Tes Crédits disponibles</div>
+                    <div id="shop-credits" style="color:#00ffcc; font-weight:800; font-size:18px;">0</div>
+                </div>
+            </div>
+
+            <div class="shop-grid" id="shop-items-container">
+                </div>
+
+            <button id="close-shop-btn" class="primary-btn">Retour au Menu</button>
         </div>
     </div>
 
     <div id="gameover-screen" class="screen-overlay hidden">
         <div class="menu-card">
             <h1>Exercice Terminé</h1>
-            <div class="menu-label">Score Final</div>
-            <div id="final-score" class="hud-value" style="font-size: 38px; margin-bottom: 20px;">00000</div>
+            
+            <div class="menu-label">Score de la session</div>
+            <div id="final-score" class="hud-value" style="font-size: 38px; margin-bottom: 5px;">00000</div>
+            <div id="credits-earned" style="color: #00ffcc; font-size: 12px; font-weight: 700; margin-bottom: 15px;">+0 Nanocrédits gagnés</div>
+            
             <div class="menu-label">Série Maximale : <span id="final-streak" style="color: #fff; font-weight: bold;">0</span></div>
-            <button id="restart-btn" class="primary-btn" style="margin-top: 20px;">Retour au Menu</button>
+            
+            <button id="second-chance-btn" class="primary-btn" style="border-color: #ff5500; color: #ff5500;">
+                🎬 Seconde Chance (+30s / +1 Vie)
+            </button>
+            
+            <button id="restart-btn" class="secondary-btn" style="margin-top: 15px; padding: 14px;">Quitter et Sauvegarder</button>
         </div>
     </div>
 
@@ -427,7 +576,7 @@
     <div class="hud-layer">
         <div class="hud-header">
             <div class="hud-panel">
-                <span class="menu-label" style="margin:0;">Temps Restant</span>
+                <span id="hud-label-left" class="menu-label" style="margin:0;">Temps Restant</span>
                 <div id="hud-timer" class="hud-value">00:00</div>
             </div>
             <div class="streak-container">
@@ -455,13 +604,30 @@
     </div>
 
     <script>
-        // États de jeu globaux
+        // Configuration de la boutique de Skins
+        const SKINS_DATA = [
+            { id: 'cyan', name: 'Cyber Cyan (Default)', color: '#00ffcc', cost: 0 },
+            { id: 'gold', name: 'Or Tactique', color: '#ffcc00', cost: 250 },
+            { id: 'pink', name: 'Rose Néon', color: '#ff00ff', cost: 500 },
+            { id: 'acid', name: 'Vert Toxique', color: '#33ff00', cost: 750 }
+        ];
+
+        // États de jeu globaux sauvegardés localement
+        let userCredits = parseInt(localStorage.getItem('sniper_credits')) || 0;
+        let highScores = JSON.parse(localStorage.getItem('sniper_highscores')) || [];
+        let unlockedSkins = JSON.parse(localStorage.getItem('sniper_skins')) || ['cyan'];
+        let currentSkin = localStorage.getItem('sniper_current_skin') || 'cyan';
+
+        // Variables de session de jeu
         let score = 0;
         let streak = 0;
         let maxStreak = 0;
         let multiplier = 1;
+        let gameMode = 'chrono'; // 'chrono' ou 'survival'
         let gameTimeAllocated = 60; 
         let timeLeft = 0;
+        let survivalLives = 3;
+        let hasUsedSecondChance = false;
         
         let gameTimerInterval = null;
         let penaltyInterval = null;
@@ -480,15 +646,27 @@
         
         const setupScreen = document.getElementById('setup-screen');
         const gameoverScreen = document.getElementById('gameover-screen');
+        const shopScreen = document.getElementById('shop-screen');
         const penaltyScreen = document.getElementById('penalty-screen');
         const penaltyTimerText = document.getElementById('penalty-timer');
         const penaltyBar = document.getElementById('penalty-bar');
 
         const hudScore = document.getElementById('hud-score');
         const hudTimer = document.getElementById('hud-timer');
+        const hudLabelLeft = document.getElementById('hud-label-left');
         const streakBadge = document.getElementById('streak-badge');
         const finalScoreText = document.getElementById('final-score');
         const finalStreakText = document.getElementById('final-streak');
+        const creditsEarnedText = document.getElementById('credits-earned');
+        const secondChanceBtn = document.getElementById('second-chance-btn');
+
+        // Initialisation de l'application
+        window.addEventListener('DOMContentLoaded', () => {
+            applySkinProperties(currentSkin);
+            renderLeaderboard();
+            updateHubCreditsDisplay();
+            buildShopUI();
+        });
 
         // Suivi ultra-fluide des coordonnées de la souris
         document.addEventListener('mousemove', (e) => {
@@ -500,7 +678,21 @@
             });
         });
 
-        // Sélection de la durée initiale
+        /* --- LOGIQUE INTERFACE MENUS ET CONFIGURATIONS --- */
+        document.getElementById('mode-chrono-btn').addEventListener('click', () => {
+            gameMode = 'chrono';
+            document.getElementById('mode-chrono-btn').classList.add('active');
+            document.getElementById('mode-survival-btn').classList.remove('active');
+            document.getElementById('time-selector-wrapper').style.display = 'block';
+        });
+
+        document.getElementById('mode-survival-btn').addEventListener('click', () => {
+            gameMode = 'survival';
+            document.getElementById('mode-survival-btn').classList.add('active');
+            document.getElementById('mode-chrono-btn').classList.remove('active');
+            document.getElementById('time-selector-wrapper').style.display = 'none';
+        });
+
         document.querySelectorAll('.time-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
@@ -513,9 +705,52 @@
         document.getElementById('restart-btn').addEventListener('click', () => {
             gameoverScreen.classList.add('hidden');
             setupScreen.classList.remove('hidden');
+            renderLeaderboard();
         });
 
-        /* --- SYSTÈME HORLOGE & INITIALISATION --- */
+        // Navigation boutique
+        document.getElementById('open-shop-btn').addEventListener('click', () => {
+            setupScreen.classList.add('hidden');
+            shopScreen.classList.remove('hidden');
+            buildShopUI();
+        });
+        document.getElementById('close-shop-btn').addEventListener('click', () => {
+            shopScreen.classList.add('hidden');
+            setupScreen.classList.remove('hidden');
+            updateHubCreditsDisplay();
+        });
+
+        /* --- ACTIONS MONÉTISATION INDIRECTE : SECONDE CHANCE --- */
+        secondChanceBtn.addEventListener('click', () => {
+            if (hasUsedSecondChance) return;
+            
+            // NOTE IMPORTANTE POUR TOI : C'est ici qu'on branchera l'appel de pub vidéo plus tard.
+            // Exemple : AdSdk.showRewardVideo().then(() => triggerResume());
+            
+            hasUsedSecondChance = true;
+            secondChanceBtn.style.display = 'none'; 
+            
+            // Résurrection
+            isGameActive = true;
+            gameoverScreen.classList.add('hidden');
+            
+            if (gameMode === 'chrono') {
+                timeLeft = 30; // Offre 30 secondes bonus
+                updateTimerText();
+                launchChronoLoop();
+            } else {
+                survivalLives = 1; // Redonne une vie de secours
+                updateTimerText();
+            }
+            
+            isPenalized = false;
+            penaltyScreen.classList.remove('active');
+            crosshair.classList.remove('disrupted');
+            moveTarget();
+        });
+
+
+        /* --- BOUCLES ET MOTEUR DE JEU --- */
         function startGame() {
             clearInterval(gameTimerInterval);
             clearInterval(penaltyInterval);
@@ -524,36 +759,52 @@
             streak = 0;
             maxStreak = 0;
             multiplier = 1;
-            timeLeft = gameTimeAllocated;
+            hasUsedSecondChance = false;
             isPenalized = false;
             isGameActive = true;
 
+            secondChanceBtn.style.display = 'block'; 
             updateHudDisplay();
-            updateTimerText();
+            
+            if (gameMode === 'chrono') {
+                hudLabelLeft.textContent = "Temps Restant";
+                timeLeft = gameTimeAllocated;
+                updateTimerText();
+                launchChronoLoop();
+            } else {
+                hudLabelLeft.textContent = "Intégrité Système";
+                survivalLives = 3;
+                updateTimerText();
+            }
             
             setupScreen.classList.add('hidden');
             penaltyScreen.classList.remove('active');
             crosshair.classList.remove('disrupted');
 
-            // Lancement du VRAI Chronomètre isolé
+            moveTarget();
+        }
+
+        function launchChronoLoop() {
             gameTimerInterval = setInterval(() => {
-                if (isGameActive) {
+                if (isGameActive && !isPenalized) {
                     timeLeft--;
                     updateTimerText();
-                    
                     if (timeLeft <= 0) {
                         endGame();
                     }
                 }
             }, 1000);
-
-            moveTarget();
         }
 
         function updateTimerText() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            hudTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            if (gameMode === 'chrono') {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                hudTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            } else {
+                // Version graphique avec des cœurs / barres d'énergie pour la Survie
+                hudTimer.textContent = "❤️ ".repeat(survivalLives) || "DÉFAILLANCE";
+            }
         }
 
         function moveTarget() {
@@ -561,16 +812,15 @@
             
             target.classList.remove('active');
             
-            // CONFIGURATION DE LA ZONE D'EXCLUSION DU HUD
-            const paddingSide = 60; // Marge pour les côtés droit, gauche et bas
-            const hudSafeZone = 150; // On interdit l'apparition dans les 150px du haut (où se trouvent le chrono, score et bonus)
+            // ZONE DE SÉCURITÉ CONSERVÉE (Exclusion absolue de la barre supérieure du HUD)
+            const paddingSide = 60; 
+            const hudSafeZone = 150; 
             
             const minX = paddingSide;
             const maxX = window.innerWidth - paddingSide;
             const minY = hudSafeZone; 
             const maxY = window.innerHeight - paddingSide;
             
-            // Calcul restreint pour protéger l'interface utilisateur
             const randomX = Math.floor(Math.random() * (maxX - minX)) + minX;
             const randomY = Math.floor(Math.random() * (maxY - minY)) + minY;
 
@@ -582,7 +832,7 @@
             }, 60);
         }
 
-        /* --- ÉCOUTEURS ET RECONNAISSANCE DES TIRS --- */
+        /* --- SYSTÈME RECONNAISSANCE DES INPUTS --- */
         function processShot(e, isKeyboard = false) {
             if (!isGameActive || isPenalized) return;
             if (e && e.target.closest('.screen-overlay')) return; 
@@ -624,7 +874,7 @@
             }
         });
 
-        /* --- COMMANDES DE HIT ET DE MISS --- */
+        /* --- LOGIQUE DE JEU : IMPACT / ÉCHEC --- */
         function handleHit(x, y) {
             streak++;
             if (streak > maxStreak) maxStreak = streak;
@@ -651,10 +901,19 @@
             streak = 0;
             multiplier = 1;
             updateHudDisplay();
+
+            if (gameMode === 'survival') {
+                survivalLives--;
+                updateTimerText();
+                if (survivalLives <= 0) {
+                    endGame();
+                    return;
+                }
+            }
             triggerPenaltyBlock();
         }
 
-        /* --- VERROUILLAGE PHYSIQUE ET VISUEL DE PÉNALITÉ --- */
+        /* --- BLOCAGE PHYSIQUE ET VISUEL DE L'ÉCRAN --- */
         function triggerPenaltyBlock() {
             isPenalized = true;
             target.classList.remove('active');
@@ -693,7 +952,6 @@
 
         function updateHudDisplay() {
             hudScore.textContent = String(score).padStart(5, '0');
-            
             if (multiplier > 1) {
                 streakBadge.textContent = `X${multiplier} (${streak} SÉRIE)`;
                 streakBadge.className = 'multiplier-badge active';
@@ -702,6 +960,7 @@
             }
         }
 
+        /* --- SAUVEGARDES, HIGH SCORES ET MONNAIE --- */
         function endGame() {
             isGameActive = false;
             clearInterval(gameTimerInterval);
@@ -711,10 +970,117 @@
             penaltyScreen.classList.remove('active');
             crosshair.classList.remove('disrupted');
             
+            // Calcul conversion de monnaie (100 pts = 1 crédit)
+            const earnedCredits = Math.floor(score / 100);
+            userCredits += earnedCredits;
+            localStorage.setItem('sniper_credits', userCredits);
+
+            // Gestion du tableau des scores locaux
+            saveHighScore(score, gameMode);
+
+            // Affichage UI de fin
             finalScoreText.textContent = String(score).padStart(5, '0');
             finalStreakText.textContent = maxStreak;
+            creditsEarnedText.textContent = `+${earnedCredits} Nanocrédits convertis`;
             
             gameoverScreen.classList.remove('hidden');
+        }
+
+        function saveHighScore(finalScore, mode) {
+            const modeLabel = mode === 'chrono' ? 'Chrono' : 'Survie';
+            highScores.push({ score: finalScore, mode: modeLabel, date: new Date().toLocaleDateString('fr-FR') });
+            // Tri décroissant
+            highScores.sort((a, b) => b.score - a.score);
+            // On garde le top 3
+            highScores = highScores.slice(0, 3);
+            localStorage.setItem('sniper_highscores', JSON.stringify(highScores));
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboard');
+            if (highScores.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:rgba(255,255,255,0.2);">Aucune simulation enregistrée</div>`;
+                return;
+            }
+            container.innerHTML = highScores.map((row, idx) => `
+                <div class="leaderboard-item">
+                    <span>#${idx+1} [${row.mode}] - ${row.date}</span>
+                    <span style="color:#00ffcc; font-weight:bold;">${String(row.score).padStart(5, '0')} pts</span>
+                </div>
+            `).join('');
+        }
+
+        function updateHubCreditsDisplay() {
+            document.getElementById('hub-credits').textContent = userCredits;
+            document.getElementById('shop-credits').textContent = userCredits;
+        }
+
+        /* --- ENGINE DE CUSTOMISATION (BOUTIQUE DE SKINS) --- */
+        function buildShopUI() {
+            const container = document.getElementById('shop-items-container');
+            container.innerHTML = SKINS_DATA.map(skin => {
+                const isUnlocked = unlockedSkins.includes(skin.id);
+                const isEquipped = currentSkin === skin.id;
+                
+                let actionText = `<span class="skin-cost">${skin.cost} Credits</span>`;
+                if (isUnlocked) {
+                    actionText = isEquipped ? `<span style="color:#00ffcc; font-size:11px;">ÉQUIPÉ</span>` : `<span style="color:rgba(255,255,255,0.4); font-size:11px;">POSSÉDÉ</span>`;
+                }
+
+                return `
+                    <div class="shop-item ${isEquipped ? 'equipped' : ''}" onclick="selectSkinItem('${skin.id}')">
+                        <div class="skin-preview" style="background:${skin.color}; color:${skin.color};"></div>
+                        <div class="skin-name">${skin.name}</div>
+                        ${actionText}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.selectSkinItem = function(id) {
+            const skin = SKINS_DATA.find(s => s.id === id);
+            const isUnlocked = unlockedSkins.includes(id);
+
+            if (isUnlocked) {
+                // Équiper le skin directement
+                currentSkin = id;
+                localStorage.setItem('sniper_current_skin', id);
+                applySkinProperties(id);
+            } else {
+                // Tenter l'achat
+                if (userCredits >= skin.cost) {
+                    userCredits -= skin.cost;
+                    unlockedSkins.push(id);
+                    currentSkin = id;
+                    
+                    localStorage.setItem('sniper_credits', userCredits);
+                    localStorage.setItem('sniper_skins', JSON.stringify(unlockedSkins));
+                    localStorage.setItem('sniper_current_skin', id);
+                    
+                    applySkinProperties(id);
+                    updateHubCreditsDisplay();
+                } else {
+                    alert("Nanocrédits insuffisants pour acquérir ce module optique !");
+                }
+            }
+            buildShopUI();
+        };
+
+        function applySkinProperties(id) {
+            const skin = SKINS_DATA.find(s => s.id === id) || SKINS_DATA[0];
+            document.documentElement.style.setProperty('--accent-cyan', skin.color);
+            // Recalcul de la lueur dynamique
+            const rgb = hexToRgb(skin.color);
+            document.documentElement.style.setProperty('--accent-glow', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`);
+        }
+
+        function hexToRgb(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 0, g: 255, b: 204 };
         }
     </script>
 </body>
