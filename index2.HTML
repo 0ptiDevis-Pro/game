@@ -306,7 +306,7 @@
             <div class="menu-label" style="margin-bottom:15px;">Meilleure Série : <span id="final-streak" style="color:#fff;">0</span></div>
             
             <button id="second-chance-btn" class="primary-btn" style="border-color:#ff6c00; color:#ff6c00;">🎬 Gilet Pare-balles (Seconde Chance)</button>
-            <button id="restart-btn" class="secondary-btn">Archiver la mission</button>
+            <button id="restart-btn" class="secondary-btn">Archiver la mission (Nouveau Run)</button>
         </div>
     </div>
 
@@ -439,7 +439,12 @@
         });
 
         document.getElementById('start-btn').addEventListener('click', startGame);
+
+        // --- NOUVELLE FONCTIONNALITÉ : DONATION LORS DU RELANCEMENT ---
         document.getElementById('restart-btn').addEventListener('click', () => {
+            alert("Faites un don pour accéder à cette fonctionnalité");
+            window.open("https://revolut.me/robini_rd", "_blank");
+            
             gameoverScreen.classList.add('hidden');
             setupScreen.classList.remove('hidden');
             renderLeaderboard();
@@ -454,7 +459,11 @@
             updateHubCreditsDisplay();
         });
 
+        // --- NOUVELLE FONCTIONNALITÉ : DONATION LORS DE LA NOUVELLE VIE/TEMPS BONUS ---
         document.getElementById('second-chance-btn').addEventListener('click', () => {
+            alert("Faites un don pour accéder à cette fonctionnalité");
+            window.open("https://revolut.me/robini_rd", "_blank");
+
             if (hasUsedSecondChance) return;
             hasUsedSecondChance = true;
             document.getElementById('second-chance-btn').style.display = 'none';
@@ -511,7 +520,6 @@
         function moveTargetToRandomWindow() {
             if (!isGameActive || isPenalized) return;
             
-            // Nettoie la cible précédente
             if (activeTargetNode) {
                 activeTargetNode.classList.remove('active', 'reverse');
             }
@@ -522,13 +530,11 @@
             setTimeout(() => {
                 if (!isGameActive || isPenalized) return;
                 
-                // Choix aléatoire de la direction de la traversée
                 if (Math.random() > 0.5) {
                     activeTargetNode.classList.add('reverse');
                 }
                 activeTargetNode.classList.add('active');
 
-                // Si la cible traverse pendant 1.8s (durée de l'animation CSS) sans être touchée :
                 clearTimeout(targetEscapeTimeout);
                 targetEscapeTimeout = setTimeout(() => {
                     if (isGameActive && !isPenalized && activeTargetNode.classList.contains('active')) {
@@ -537,7 +543,7 @@
                             survivalLives--; updateTimerText();
                             if (survivalLives <= 0) { endGame(); return; }
                         }
-                        triggerRipostePenalty(); // Pénalité d'échappée
+                        triggerRipostePenalty(); 
                     }
                 }, 1800);
 
@@ -560,19 +566,18 @@
             }
 
             if (hit) {
-                clearTimeout(targetEscapeTimeout); // On a touché, on annule l'échappée
+                clearTimeout(targetEscapeTimeout); 
                 streak++; if (streak > maxStreak) maxStreak = streak;
                 multiplier = streak >= 15 ? 4 : streak >= 10 ? 3 : streak >= 5 ? 2 : 1;
                 
                 const pointsEarned = (100 * multiplier);
                 score += pointsEarned;
                 
-                // ACTUALISATION IMMÉDIATE DES DOLLARS EN TEMPS RÉEL
                 const dollarsEarned = Math.floor(pointsEarned / 100);
                 userCredits += dollarsEarned;
                 sessionEarned += dollarsEarned;
                 localStorage.setItem('trigger_credits', userCredits);
-                updateHubCreditsDisplay(); // Met à jour l'affichage de l'agence discrètement
+                updateHubCreditsDisplay(); 
 
                 updateHudDisplay();
 
@@ -588,7 +593,7 @@
                     survivalLives--; updateTimerText();
                     if (survivalLives <= 0) { endGame(); return; }
                 }
-                triggerRipostePenalty(); // Pénalité pour tir manqué
+                triggerRipostePenalty(); 
             }
         }
 
